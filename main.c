@@ -11,6 +11,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "EasyBmpC.h"
+
 #define DEBUG
 
 #ifdef DEBUG
@@ -81,7 +83,7 @@ static int COMM_ImageByteConvert (const void *pSrc, unsigned int nSrcSize,
 
 static void bitprint(const void *pData, int nSize)
 {
-    char bitmap[8] = {0x1,0x2,0x4,0x8,0x10,0x20,0x40,0x80};
+    unsigned char bitmap[8] = {0x1,0x2,0x4,0x8,0x10,0x20,0x40,0x80};
 
     for (int i = 0; i < nSize; ++i)
     {
@@ -109,25 +111,48 @@ static void bitprint(const void *pData, int nSize)
 
 int main(int argc, char *argv[])
 {
-    char src[256] = {};
-    for (int i = 0; i < sizeof(src); ++i)
+    int ret = -1;
+    HANDLE_EASYBMP hBMP = NULL;
+
+    do 
     {
-        src[i] = i;
+        if (argc != 2)
+        {
+            printf ("usage: %s [filename]\n", argv[0]);
+            break;
+        }
+        const char *szFile = argv[1];
+
+        printf ("file=%s\n", szFile);
+
+        hBMP = easybmpc_create();
+        if (hBMP == NULL)
+        {
+            printf ("create failed\n");
+            break;
+        }
+
+        ret = easybmpc_open (hBMP, szFile);
+        if (ret < 0)
+        {
+            printf ("open file %s failed\n", szFile);
+            break;
+        }
+
+        int nW = 0;
+        int nH = 0;
+        ret = easybmpc_size (hBMP, & nW, & nH);
+        printf ("w=%d,h=%d\n", nW, nH);
+
+        ret = 0;
+    }
+    while (0);
+
+    if (hBMP != NULL)
+    {
+        easybmpc_destroy (hBMP);
+        hBMP = NULL;
     }
 
-    src[0] = 0xFF;
-    src[1] = 0x00;
-    src[2] = 0x00;
-
-    bitprint (src, 3);
-
-    char dst[256] = {};
-    COMM_ImageByteConvert (src, 6, dst, 4, COMM_RGB_1555);
-
-    bitprint (dst, 4);
-
-    return 0;
+    return ret;
 }
-
-libjpeg
-bmp
