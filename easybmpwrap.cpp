@@ -1,7 +1,22 @@
 
-#include "EasyBmpWrap.h"
+#include "easybmpwrap.h"
 
 #include "EasyBMP.h"
+
+#ifdef DEBUG
+#define _debug(x...) do {printf("[debug][%s %d %s]", \
+	__FILE__,__LINE__,__FUNCTION__);printf(x);} while (0)
+#define _info(x...) do {printf("[info][%s %d %s]", \
+	__FILE__,__LINE__,__FUNCTION__);printf(x);} while (0)
+#define _error(x...) do {printf("[error][%s %d %s]", \
+	__FILE__,__LINE__,__FUNCTION__);printf(x);} while (0)
+#else 
+#define _debug(x...) do {;} while (0)
+#define _info(x...) do {printf("[info][%s %d %s]", \
+	__FILE__,__LINE__,__FUNCTION__);printf(x);} while (0)
+#define _error(x...) do {printf("[error][%s %d %s]", \
+	__FILE__,__LINE__,__FUNCTION__);printf(x);} while (0)
+#endif 
 
 HANDLE_EASYBMP easybmpc_create()
 {

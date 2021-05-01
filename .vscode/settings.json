@@ -1,7 +1,8 @@
 {
     "C_Cpp.default.includePath": [
         "include",
-        "include/easybmp"
+        "include/easybmp",
+        "include/jpeglib"
     ],
     "files.associations": {
         "easybmp.h": "c",
