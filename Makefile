@@ -1,4 +1,4 @@
-DIR_INC = ./include ./include/easybmp
+DIR_INC = -I./include -I./include/easybmp
 DIR_SRC = .
 DIR_OBJ = ./obj
 DIR_BIN = ./bin
@@ -6,7 +6,7 @@ DIR_BIN = ./bin
 SRC = $(wildcard $(DIR_SRC)/*.c)
 SRCPP = $(wildcard $(DIR_SRC)/*.cpp)
 OBJ = $(patsubst %.c,$(DIR_OBJ)/%.o,$(notdir $(SRC)))
-OBJ += $(patsubst %.cpp,$(DIR_OBJ)/%.o,$(notdir $(SRC)))
+OBJ += $(patsubst %.cpp,$(DIR_OBJ)/%.o,$(notdir $(SRCPP)))
 
 TARGET = image.out
 
@@ -15,7 +15,7 @@ BIN_TARGET = $(DIR_BIN)/$(TARGET)
 CC = g++
 AR = ar -rcs
 
-CFLAGS = -g -Wall -I$(DIR_INC)
+CFLAGS = -g -Wall $(DIR_INC)
 LFLAGS = -L./lib -leasybmp
 
 $(BIN_TARGET):$(OBJ)
@@ -31,4 +31,4 @@ $(DIR_OBJ)/%.o:$(DIR_SRC)/%.cpp
     
 clean:
 	rm -rf $(OBJ)
-	rm -rf $(DIR_BIN)/$(BIN_TARGET)
+	rm -rf $(BIN_TARGET)

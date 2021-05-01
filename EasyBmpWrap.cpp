@@ -1,5 +1,5 @@
 
-#include "EasyBmpC.h"
+#include "EasyBmpWrap.h"
 
 #include "EasyBMP.h"
 

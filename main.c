@@ -11,7 +11,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "EasyBmpC.h"
+#include "EasyBmpWrap.h"
 
 #define DEBUG
 
