@@ -39,3 +39,17 @@ int easybmpc_size(HANDLE_EASYBMP hBMP, int *pW, int *pH)
     ret = 0;
     return ret;
 }
+
+int easybmpc_get(HANDLE_EASYBMP hBMP, EasyBmp_Pixel *pPixel, int i, int j)
+{
+    int ret = -1;
+    BMP* pBMP = static_cast<BMP*>(hBMP);
+    RGBApixel sPixel = pBMP->GetPixel (i, j);
+    pPixel->R = sPixel.Red;
+    pPixel->G = sPixel.Green;
+    pPixel->B = sPixel.Blue;
+    pPixel->A = sPixel.Alpha;
+    
+    ret = 0;
+    return ret;
+}

@@ -144,6 +144,20 @@ int main(int argc, char *argv[])
         ret = easybmpc_size (hBMP, & nW, & nH);
         printf ("w=%d,h=%d\n", nW, nH);
 
+        int nSize = nW * nH * sizeof(EasyBmp_Pixel);
+        EasyBmp_Pixel *pPixelData = (EasyBmp_Pixel *)malloc (nSize);
+        for (int i = 0; i < nW; ++i)
+        {
+            for (int j = 0; j < nH; ++j)
+            {
+                easybmpc_get (hBMP, & pPixelData[i + j * nW], i, j);
+            }
+        }
+
+        bitprint (pPixelData, nSize);
+
+        free (pPixelData);
+
         ret = 0;
     }
     while (0);

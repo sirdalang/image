@@ -13,11 +13,21 @@ extern "C" {
 
 typedef void * HANDLE_EASYBMP;
 
-HANDLE_EASYBMP easybmpc_create();
-int easybmpc_destroy(HANDLE_EASYBMP hBMP);
+typedef struct EasyBmp_Pixel
+{
+    char R;
+    char G;
+    char B;
+    char A;
+} EasyBmp_Pixel;
+
+HANDLE_EASYBMP  easybmpc_create();
+int             easybmpc_destroy(HANDLE_EASYBMP hBMP);
 
 int easybmpc_open(HANDLE_EASYBMP hBMP, const char *szFile);
 int easybmpc_size(HANDLE_EASYBMP hBMP, int *pW, int *pH);
+
+int easybmpc_get(HANDLE_EASYBMP hBMP, EasyBmp_Pixel *pPixel, int i, int j);
 
 #ifdef __cplusplus
 }

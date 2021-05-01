@@ -3,6 +3,7 @@
         "include"
     ],
     "files.associations": {
-        "easybmp.h": "c"
+        "easybmp.h": "c",
+        "easybmp_bmp.h": "c"
     }
 }
