@@ -12,16 +12,23 @@ BIN_TARGET = $(DIR_BIN)/$(TARGET)
 
 CC = g++
 AR = ar -rcs
+MKDIR = mkdir
 
 CFLAGS = -g -Wall -I$(DIR_INC)
 
-$(BIN_TARGET):$(OBJ)
+$(BIN_TARGET):$(OBJ) $(DIR_BIN)
 	$(AR) $@ $(OBJ)
 	cp -v bin/libeasybmp.a ../../lib/
 	cp -v *.h ../../include/easybmp/
 
-$(DIR_OBJ)/%.o:$(DIR_SRC)/%.cpp
+$(DIR_OBJ)/%.o:$(DIR_SRC)/%.cpp $(DIR_OBJ)
 	$(CC) $(CFLAGS) -c $< -o $@
+
+$(DIR_OBJ):
+	$(MKDIR) -p $@
+
+$(DIR_BIN):
+	$(MKDIR) -p $@
 
 .PHONY:clean
     

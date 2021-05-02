@@ -14,6 +14,7 @@ BIN_TARGET = $(TARGET)
 
 CC = g++
 AR = ar -rcs
+MKDIR = mkdir
 
 CFLAGS = -g -Wall $(DIR_INC)
 LFLAGS = -L./lib -leasybmp -ljpeg
@@ -24,8 +25,11 @@ $(BIN_TARGET):$(OBJ)
 $(DIR_OBJ)/%.o:$(DIR_SRC)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(DIR_OBJ)/%.o:$(DIR_SRC)/%.cpp
+$(DIR_OBJ)/%.o:$(DIR_SRC)/%.cpp $(DIR_OBJ)
 	$(CC) $(CFLAGS) -c $< -o $@
+
+$(DIR_OBJ):
+	$(MKDIR) -p $@
 
 .PHONY:clean
     
