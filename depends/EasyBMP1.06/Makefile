@@ -17,6 +17,8 @@ CFLAGS = -g -Wall -I$(DIR_INC)
 
 $(BIN_TARGET):$(OBJ)
 	$(AR) $@ $(OBJ)
+	cp -v bin/libeasybmp.a ../../lib/
+	cp -v *.h ../../include/easybmp/
 
 $(DIR_OBJ)/%.o:$(DIR_SRC)/%.cpp
 	$(CC) $(CFLAGS) -c $< -o $@

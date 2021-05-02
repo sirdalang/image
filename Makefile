@@ -1,4 +1,4 @@
-DIR_INC = -I./include -I./include/easybmp
+DIR_INC = -I./include -I./include/easybmp -I./include/jpeglib
 DIR_SRC = .
 DIR_OBJ = ./obj
 DIR_BIN = ./bin
@@ -10,13 +10,13 @@ OBJ += $(patsubst %.cpp,$(DIR_OBJ)/%.o,$(notdir $(SRCPP)))
 
 TARGET = image.out
 
-BIN_TARGET = $(DIR_BIN)/$(TARGET)
+BIN_TARGET = $(TARGET)
 
 CC = g++
 AR = ar -rcs
 
 CFLAGS = -g -Wall $(DIR_INC)
-LFLAGS = -L./lib -leasybmp
+LFLAGS = -L./lib -leasybmp -ljpeg
 
 $(BIN_TARGET):$(OBJ)
 	$(CC) -o $@ $(OBJ) $(LFLAGS)

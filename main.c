@@ -11,7 +11,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "easybmpwrap.h"
+#include "image2rgba.h"
 
 #define DEBUG
 
@@ -43,7 +43,7 @@ static int COMM_ImageByteConvert (const void *pSrc, unsigned int nSrcSize,
     {
         int i = 0;
         int j = 0;
-        for (int i = 0; i < nSrcSize; i += 3)
+        for (int i = 0; i < (int)nSrcSize; i += 3)
         {
             unsigned char R = ((const char *)pSrc)[i];
             unsigned char G = ((const char *)pSrc)[i+1];
@@ -65,7 +65,7 @@ static int COMM_ImageByteConvert (const void *pSrc, unsigned int nSrcSize,
 
         if (i + 1 != nSrcSize)
         {
-            printf ("[%s %d %s]: dst buffer small [src=%d,dst=%d]\n", 
+            _error ("[%s %d %s]: dst buffer small [src=%d,dst=%d]\n", 
                 __FILE__,__LINE__,__FUNCTION__,
                 nSrcSize, nDstSize);
             bError = 1;
@@ -73,7 +73,7 @@ static int COMM_ImageByteConvert (const void *pSrc, unsigned int nSrcSize,
     }
     else 
     {
-        printf ("[%s %d %s]: not support type[%d]\n", 
+        _error ("[%s %d %s]: not support type[%d]\n", 
                 __FILE__,__LINE__,__FUNCTION__,
                 eConvType);
     }
@@ -109,64 +109,67 @@ static void bitprint(const void *pData, int nSize)
     printf ("\n");
 }
 
+static void RGBAprint(const Image2RGBA_Pixel *pPixel, int nPixelCount, int nWidth)
+{
+    for (int i = 0; i < nPixelCount; ++i)
+    {
+        printf ("[%02x %02x %02x %02x] ", 
+            pPixel[i].R, 
+            pPixel[i].G,
+            pPixel[i].B,
+            pPixel[i].A);
+        if (nWidth <= 0)
+        {
+            printf ("\n");
+        }
+        else if ((i + 1) % nWidth == 0)
+        {
+            printf ("\n");
+        }
+    }
+    printf ("\n");
+}
+
 int main(int argc, char *argv[])
 {
-    int ret = -1;
-    HANDLE_EASYBMP hBMP = NULL;
-
-    do 
+    if (argc != 2)
     {
-        if (argc != 2)
-        {
-            printf ("usage: %s [filename]\n", argv[0]);
-            break;
-        }
-        const char *szFile = argv[1];
-
-        printf ("file=%s\n", szFile);
-
-        hBMP = easybmpc_create();
-        if (hBMP == NULL)
-        {
-            printf ("create failed\n");
-            break;
-        }
-
-        ret = easybmpc_open (hBMP, szFile);
-        if (ret < 0)
-        {
-            printf ("open file %s failed\n", szFile);
-            break;
-        }
-
-        int nW = 0;
-        int nH = 0;
-        ret = easybmpc_size (hBMP, & nW, & nH);
-        printf ("w=%d,h=%d\n", nW, nH);
-
-        int nSize = nW * nH * sizeof(EasyBmp_Pixel);
-        EasyBmp_Pixel *pPixelData = (EasyBmp_Pixel *)malloc (nSize);
-        for (int i = 0; i < nW; ++i)
-        {
-            for (int j = 0; j < nH; ++j)
-            {
-                easybmpc_get (hBMP, & pPixelData[i + j * nW], i, j);
-            }
-        }
-
-        bitprint (pPixelData, nSize);
-
-        free (pPixelData);
-
-        ret = 0;
-    }
-    while (0);
-
-    if (hBMP != NULL)
-    {
-        easybmpc_destroy (hBMP);
-        hBMP = NULL;
+        _error ("usage: %s [filename]\n", argv[0]);
+        return -1;   
     }
 
-    return ret;
+    const char *szFile = argv[1];
+
+    HANDLE_IMAGE2RGBA handle = NULL;
+
+    _debug ("open file %s\n", szFile);
+
+    handle = image2rgba_open (szFile);
+    if (handle == NULL)
+    {
+        _error ("open failed\n");
+        return -1;
+    }
+
+    int nW = 0;
+    int nH = 0;
+    image2rgba_getsize (handle, &nW, &nH);
+
+    _debug ("[%d,%d]\n", nW, nH);
+
+    int nPixelSize = nW * nH;
+    int nByteSize = nPixelSize * sizeof(Image2RGBA_Pixel);
+    Image2RGBA_Pixel *pPixel = (Image2RGBA_Pixel*)malloc (nByteSize);
+    for (int y = 0; y < nH; ++y)
+    {
+        for (int x = 0; x < nW; ++x)
+        {
+            image2rgba_getpixel (handle, x, y, & pPixel[x + y * nH]);
+        }
+    }
+    RGBAprint (pPixel, nPixelSize, nW);
+
+    image2rgba_close (handle);
+
+    return 0;
 }
