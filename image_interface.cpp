@@ -18,9 +18,9 @@ ImageInterface::~ImageInterface()
 bool ImageInterface::LoadFile (const char *szFileName)
 {
     m_bFileLoaded = false;
-    m_vectPixelArray.resize (0);
     m_nWidth = 0;
     m_nHeight = 0;
+    m_vectPixelArray.resize (0);
     m_strFileName = std::string(szFileName);
 
     bool ret = CheckOrLoadFile();
@@ -68,6 +68,7 @@ bool ImageInterface::CheckOrLoadFile ()
 
     if (LoadFile_override())
     {
+        m_bFileLoaded = true;
         return true;
     }
 
