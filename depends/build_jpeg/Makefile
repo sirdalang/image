@@ -8,7 +8,7 @@ MKDIR=mkdir -p
 RM=rm -rfv
 CP=cp -v
 
-$(TARGET):$(BUILD_DIR) $(OUTPUT_DIR) $(CONFIGURE)
+$(TARGET): $(CONFIGURE) | $(BUILD_DIR) $(OUTPUT_DIR)
 	make -C $(BUILD_DIR) -j4
 	make -C $(BUILD_DIR) install
 	$(CP) output/include/* ../../include/jpeglib/

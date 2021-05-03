@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <stdio.h>
+
 #include "def.h"
 
 #ifdef DEBUG

@@ -5,7 +5,8 @@
         "include/jpeglib"
     ],
     "files.associations": {
-        "easybmp.h": "c",
-        "easybmp_bmp.h": "c"
+        "def_inner.h": "c",
+        "image2rgba.h": "c",
+        "def.h": "c"
     }
 }

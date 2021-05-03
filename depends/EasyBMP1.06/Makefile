@@ -24,12 +24,6 @@ $(BIN_TARGET):$(OBJ) $(DIR_BIN)
 $(DIR_OBJ)/%.o:$(DIR_SRC)/%.cpp $(DIR_OBJ)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(DIR_OBJ):
-	$(MKDIR) -p $@
-
-$(DIR_BIN):
-	$(MKDIR) -p $@
-
 .PHONY:clean
     
 clean:

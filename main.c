@@ -12,6 +12,7 @@
 #include <stdlib.h>
 
 #include "image2rgba.h"
+#include "image_tools.h"
 
 #define DEBUG
 
@@ -29,57 +30,6 @@
 #define _error(x...) do {printf("[error][%s %d %s]", \
 	__FILE__,__LINE__,__FUNCTION__);printf(x);} while (0)
 #endif 
-
-typedef enum 
-{
-    COMM_RGB_1555,
-} COMM_CONVERT_TYPE_E;
-
-static int COMM_ImageByteConvert (const void *pSrc, unsigned int nSrcSize, 
-    void *pDst, unsigned int nDstSize, COMM_CONVERT_TYPE_E eConvType)
-{
-    int bError = 0;
-    if (COMM_RGB_1555 == eConvType)
-    {
-        int i = 0;
-        int j = 0;
-        for (int i = 0; i < (int)nSrcSize; i += 3)
-        {
-            unsigned char R = ((const char *)pSrc)[i];
-            unsigned char G = ((const char *)pSrc)[i+1];
-            unsigned char B = ((const char *)pSrc)[i+2];
-
-            char dc1555[2] = {};
-            dc1555[0] = (R & 0xF8) >> 3;        // 1-5 bit
-            dc1555[0] = dc1555[0] ^ (G & 0xF8 >> 3);       // 6-8 bit
-            dc1555[1] = G & 0xC0 >> 3;          // 9-10 bit
-            dc1555[1] = dc1555[1] ^ B & 0xF8;   // 11 - 15 bit
-            dc1555[1] = dc1555[1] | 0x80;       // 16 bit
-
-            if (j + 1 < nDstSize)
-            {
-                ((char *)pDst)[j + 1] = dc1555[0];
-                ((char *)pDst)[j + 2] = dc1555[1];
-            }
-        }
-
-        if (i + 1 != nSrcSize)
-        {
-            _error ("[%s %d %s]: dst buffer small [src=%d,dst=%d]\n", 
-                __FILE__,__LINE__,__FUNCTION__,
-                nSrcSize, nDstSize);
-            bError = 1;
-        }
-    }
-    else 
-    {
-        _error ("[%s %d %s]: not support type[%d]\n", 
-                __FILE__,__LINE__,__FUNCTION__,
-                eConvType);
-    }
-
-    return bError;
-}
 
 static void bitprint(const void *pData, int nSize)
 {
@@ -168,6 +118,15 @@ int main(int argc, char *argv[])
         }
     }
     RGBAprint (pPixel, nPixelSize, nW);
+
+    void *pU1555Buf = malloc (nByteSize / 2);
+
+    imagetools_rawconvert (pPixel, nByteSize, pU1555Buf, nByteSize / 2, IMAGE_RAW_RGBA_1555);
+    bitprint (pPixel, nByteSize);
+    bitprint (pU1555Buf, nByteSize / 2);
+
+    free (pPixel);
+    pPixel = NULL;
 
     image2rgba_close (handle);
 

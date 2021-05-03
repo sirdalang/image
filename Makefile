@@ -10,7 +10,7 @@ SRCPP = $(wildcard $(DIR_SRC)/*.cpp)
 OBJ = $(patsubst %.c,$(DIR_OBJ)/%.o,$(notdir $(SRC)))
 OBJ += $(patsubst %.cpp,$(DIR_OBJ)/%.o,$(notdir $(SRCPP)))
 
-TARGET = image.out
+TARGET = test.out
 
 BIN_TARGET = $(TARGET)
 
@@ -21,13 +21,13 @@ MKDIR = mkdir
 CFLAGS = -g -Wall $(DIR_INC)
 LFLAGS = -L$(DIR_LIB) -leasybmp -ljpeg
 
-$(BIN_TARGET):$(OBJ) $(DIR_LIB)
+$(BIN_TARGET):$(OBJ) | $(DIR_LIB)
 	$(CC) -o $@ $(OBJ) $(LFLAGS)
 
-$(DIR_OBJ)/%.o:$(DIR_SRC)/%.c $(DIR_OBJ)
+$(DIR_OBJ)/%.o:$(DIR_SRC)/%.c | $(DIR_OBJ)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(DIR_OBJ)/%.o:$(DIR_SRC)/%.cpp $(DIR_OBJ)
+$(DIR_OBJ)/%.o:$(DIR_SRC)/%.cpp | $(DIR_OBJ)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(DIR_OBJ):
