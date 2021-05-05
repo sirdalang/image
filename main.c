@@ -80,6 +80,25 @@ static void RGBAprint(const Image2RGBA_Pixel *pPixel, int nPixelCount, int nWidt
     printf ("\n");
 }
 
+static void C1555print(const void *pData, int nSize, int nWidth)
+{
+    int nPixelCount = nSize / 2;
+    const unsigned short *phData = (const unsigned short *)pData;
+    for (int i = 0; i < nSize; ++i)
+    {
+        printf ("[%04x] ", phData[i]);
+        if (nWidth <= 0)
+        {
+            printf ("\n");
+        }
+        else if ((i + 1) % nWidth == 0)
+        {
+            printf ("\n");
+        }
+    }
+    printf ("\n");
+}
+
 int main(int argc, char *argv[])
 {
     if (argc != 2)
@@ -125,10 +144,16 @@ int main(int argc, char *argv[])
     bitprint (pPixel, nByteSize);
     bitprint (pU1555Buf, nByteSize / 2);
 
+    C1555print (pU1555Buf, nByteSize, nW);
+
     free (pPixel);
     pPixel = NULL;
+    free (pU1555Buf);
+    pU1555Buf = NULL;
 
     image2rgba_close (handle);
+
+    
 
     return 0;
 }
