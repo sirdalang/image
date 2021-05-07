@@ -45,3 +45,11 @@
 #define IMAGE_NAME_IMPORT \
     using namespace IMAGE_NAMESPACE_NAME
 #endif 
+
+typedef enum IMAGE_FILE_TYPE_E
+{
+	IMAGE_UNKNOWN = 0x0,
+	IMAGE_BMP = 0x1,
+	IMAGE_JPEG,
+	IMAGE_PNG
+} IMAGE_FILE_TYPE_E;

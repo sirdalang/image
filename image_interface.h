@@ -17,6 +17,7 @@ public:
     int Width();
     int Height();
     bool GetPixel(int x, int y, Pixel& refPixel);
+    static bool GuessImageType(const char *szFilename, IMAGE_FILE_TYPE_E *eType);
 protected:
     ImageInterface(const ImageInterface& ref)=delete;
     ImageInterface& operator=(const ImageInterface& ref)=delete;

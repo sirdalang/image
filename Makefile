@@ -35,7 +35,6 @@ $(DIR_OBJ):
 
 $(DIR_LIB):
 	$(MKDIR) -p $@
-	make -C $(DIR_DEPENDS)
 
 .PHONY:clean
     

@@ -17,22 +17,38 @@ HANDLE_IMAGE2RGBA       image2rgba_open(const char *szFile)
 
     do 
     {
-        if (strstr(szFile, BMP_SUFFIX) != nullptr)
+        IMAGE_FILE_TYPE_E eType = IMAGE_UNKNOWN;
+        if (! ImageInterface::GuessImageType (szFile, & eType))
         {
-            pObj = new ImageBMP();
-        }
-        else if (strstr (szFile, JPEG_SUFFIX) != nullptr
-            || strstr (szFile, JPEG_SUFFIX_2) != nullptr)
-        {
-            pObj = new ImageJpeg();
+            _error ("guess failed\n");
+            break;
         }
         else 
         {
-            _error ("filetype not support [%s]\n", szFile);
-            break;
+            switch (eType)
+            {
+                case IMAGE_BMP:
+                {
+                    pObj = new ImageBMP();
+                }
+                break;
+                case IMAGE_JPEG:
+                {
+                    pObj = new ImageJpeg();
+                }
+                break;
+                default:
+                {
+                    // blank
+                }
+                break;
+            }
         }
 
-        pObj->LoadFile(szFile);
+        if (pObj)
+        {
+            pObj->LoadFile(szFile);
+        }
     }
     while (0);
 

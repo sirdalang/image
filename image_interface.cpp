@@ -1,5 +1,12 @@
 #include "image_interface.h"
 
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h> 
+
+#include <string.h>
+
 #include "def_inner.h"
 
 IMAGE_NAME_IMPORT;
@@ -57,6 +64,59 @@ bool ImageInterface::GetPixel(int x, int y, Pixel& refPixel)
 
     refPixel = m_vectPixelArray[nPixelPos];
     return true;
+}
+
+bool ImageInterface::GuessImageType(const char *szFilename, IMAGE_FILE_TYPE_E *eType)
+{
+    bool bGuessOk = false;
+
+    const uint8_t jpg_file_head[] = {0xff, 0xd8, 0xff};
+    const uint8_t png_file_head[] = {0x89, 0x50, 0x4e, 0x47, 0x0d, 0xa0, 0x1a, 0x0a};
+    const uint8_t bmp_file_head[] = {0x42, 0x4d};
+
+    int fd = -1;
+    int nBytesRead = 0;
+    char byteFileBuf[32] = {}; // ENSURE: bigger than header
+
+    do 
+    {
+        fd = open (szFilename, O_RDONLY);
+        if (fd < 0)
+        {
+            _error ("open file failed [%s]\n", szFilename);
+            break;
+        }
+
+        nBytesRead = read (fd, byteFileBuf, sizeof(byteFileBuf));
+        if (nBytesRead < 0)
+        {
+            _error ("read failed\n");
+            break;
+        }
+
+        if (memcmp(jpg_file_head, byteFileBuf, sizeof(jpg_file_head)) == 0)
+        {
+            *eType = IMAGE_JPEG;
+            bGuessOk = true;
+        }
+        else if (memcmp (png_file_head, byteFileBuf, sizeof(png_file_head)) == 0)
+        {
+            *eType = IMAGE_PNG;
+            bGuessOk = true;
+        }
+        else if (memcmp (bmp_file_head, byteFileBuf, sizeof(bmp_file_head)) == 0)
+        {
+            *eType = IMAGE_BMP;
+            bGuessOk = true;
+        }
+        else 
+        {
+            _error ("file format guess failed\n");
+        }
+    }
+    while (0);
+
+    return bGuessOk ? true : false;
 }
 
 bool ImageInterface::CheckOrLoadFile ()

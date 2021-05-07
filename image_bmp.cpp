@@ -21,8 +21,8 @@ bool ImageBMP::LoadFile_override()
             break;
         }
 
-        m_nHeight = bmp.TellWidth();
-        m_nWidth = bmp.TellHeight();
+        m_nWidth = bmp.TellWidth();
+        m_nHeight = bmp.TellHeight();
 
         int nPixelCount = m_nHeight * m_nWidth;
         m_vectPixelArray.resize (nPixelCount);
