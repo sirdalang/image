@@ -6,11 +6,19 @@
 
 #pragma once
 
-#include "def.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif 
+
+typedef struct Pixel
+{
+    unsigned char R;
+    unsigned char G;
+    unsigned char B;
+    unsigned char A;
+} Image2RGBA_Pixel;
+
+typedef void* HANDLE_IMAGE2RGBA;
 
 HANDLE_IMAGE2RGBA       image2rgba_open(const char *szFile);
 int                     image2rgba_close(HANDLE_IMAGE2RGBA handle);

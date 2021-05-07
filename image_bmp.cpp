@@ -1,6 +1,5 @@
 #include "image_bmp.h"
 
-#include "def.h"
 #include "def_inner.h"
 
 #include "EasyBMP.h"

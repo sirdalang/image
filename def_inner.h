@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 
-#include "def.h"
+#include "image2rgba.h"
 
 #ifdef DEBUG
 #define _debug(x...) do {printf("[debug][%s %d %s]", \

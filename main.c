@@ -84,7 +84,7 @@ static void C1555print(const void *pData, int nSize, int nWidth)
 {
     int nPixelCount = nSize / 2;
     const unsigned short *phData = (const unsigned short *)pData;
-    for (int i = 0; i < nSize; ++i)
+    for (int i = 0; i < nPixelCount; ++i)
     {
         printf ("[%04x] ", phData[i]);
         if (nWidth <= 0)
@@ -141,8 +141,9 @@ int main(int argc, char *argv[])
     void *pU1555Buf = malloc (nByteSize / 2);
 
     imagetools_rawconvert (pPixel, nByteSize, pU1555Buf, nByteSize / 2, IMAGE_RAW_RGBA_1555);
+
     bitprint (pPixel, nByteSize);
-    bitprint (pU1555Buf, nByteSize / 2);
+    // bitprint (pU1555Buf, nByteSize / 2);
 
     C1555print (pU1555Buf, nByteSize, nW);
 
