@@ -7,6 +7,8 @@
     "files.associations": {
         "def_inner.h": "c",
         "image2rgba.h": "c",
-        "def.h": "c"
+        "def.h": "c",
+        "*.tcc": "cpp",
+        "memory_resource": "cpp"
     }
 }

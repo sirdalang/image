@@ -84,3 +84,14 @@ int image2rgba_getpixel(HANDLE_IMAGE2RGBA handle, int i, int j, Image2RGBA_Pixel
 
     return ret ? 0 : -1;
 }
+
+int image2rgba_replaceall(HANDLE_IMAGE2RGBA handle, const Image2RGBA_Pixel *cpOldPixel, const Image2RGBA_Pixel *cpNewPixel)
+{
+    ImageInterface *pObj = static_cast<ImageInterface*> (handle);
+
+    int ret = pObj->ReplaceAllPixel (* cpOldPixel, * cpNewPixel);
+
+    _debug ("replace %d pixels\n", ret);
+
+    return (ret < 0) ? -1 : 0;
+}

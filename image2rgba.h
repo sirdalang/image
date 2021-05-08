@@ -26,6 +26,8 @@ int                     image2rgba_close(HANDLE_IMAGE2RGBA handle);
 int image2rgba_getsize(HANDLE_IMAGE2RGBA handle, int *pW, int *pH);
 int image2rgba_getpixel(HANDLE_IMAGE2RGBA handle, int i, int j, Image2RGBA_Pixel *pPixel);
 
+int image2rgba_replaceall(HANDLE_IMAGE2RGBA handle, const Image2RGBA_Pixel *cpOldPixel, const Image2RGBA_Pixel *cpNewPixel);
+
 #ifdef __cplusplus
 }
 #endif

@@ -138,11 +138,26 @@ int main(int argc, char *argv[])
     }
     RGBAprint (pPixel, nPixelSize, nW);
 
+    Image2RGBA_Pixel oldPixel = {0,0,0,0};
+    Image2RGBA_Pixel newPixel = {0,0,0,255};
+    image2rgba_replaceall (handle, &oldPixel, &newPixel);
+
+    for (int y = 0; y < nH; ++y)
+    {
+        for (int x = 0; x < nW; ++x)
+        {
+            image2rgba_getpixel (handle, x, y, & pPixel[x + y * nH]);
+        }
+    }
+    RGBAprint (pPixel, nPixelSize, nW);
+
+    image2rgba_close (handle);
+
     void *pU1555Buf = malloc (nByteSize / 2);
 
     imagetools_rawconvert (pPixel, nByteSize, pU1555Buf, nByteSize / 2, IMAGE_RAW_RGBA_1555);
 
-    bitprint (pPixel, nByteSize);
+    // bitprint (pPixel, nByteSize);
     // bitprint (pU1555Buf, nByteSize / 2);
 
     C1555print (pU1555Buf, nByteSize, nW);
@@ -151,8 +166,6 @@ int main(int argc, char *argv[])
     pPixel = NULL;
     free (pU1555Buf);
     pU1555Buf = NULL;
-
-    image2rgba_close (handle);
 
     
 

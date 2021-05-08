@@ -66,6 +66,33 @@ bool ImageInterface::GetPixel(int x, int y, Pixel& refPixel)
     return true;
 }
 
+int ImageInterface::ReplaceAllPixel(const Pixel & refOld, const Pixel &refNew)
+{
+    int nPixelCount = 0;
+
+    if (! CheckOrLoadFile())
+    {
+        return -1;
+    }
+
+    if (sizeof(refOld) != sizeof(m_vectPixelArray[0]))
+    {
+        _error ("inner error, size not match\n");
+        return -1;
+    }
+
+    for (std::size_t i = 0; i < m_vectPixelArray.size(); ++i)
+    {
+        if (memcmp (&refOld, &m_vectPixelArray[i], sizeof(refOld)) == 0) // memcmp
+        {
+            m_vectPixelArray[i] = refNew; // memcpy
+            ++nPixelCount;
+        }
+    }
+
+    return nPixelCount;
+}
+
 bool ImageInterface::GuessImageType(const char *szFilename, IMAGE_FILE_TYPE_E *eType)
 {
     bool bGuessOk = false;
