@@ -66,7 +66,7 @@ bool ImageInterface::GetPixel(int x, int y, Pixel& refPixel)
     return true;
 }
 
-int ImageInterface::ReplaceAllPixel(const Pixel & refOld, const Pixel &refNew)
+int ImageInterface::SetToTwoColor (const Pixel & refLightPixel, const Pixel &refDarkPixel, const Pixel &refMidPixel)
 {
     int nPixelCount = 0;
 
@@ -75,19 +75,25 @@ int ImageInterface::ReplaceAllPixel(const Pixel & refOld, const Pixel &refNew)
         return -1;
     }
 
-    if (sizeof(refOld) != sizeof(m_vectPixelArray[0]))
+    if (sizeof(refLightPixel) != sizeof(m_vectPixelArray[0]))
     {
         _error ("inner error, size not match\n");
         return -1;
     }
 
+    int nMidLight = refMidPixel.R + refMidPixel.G + refMidPixel.B;
     for (std::size_t i = 0; i < m_vectPixelArray.size(); ++i)
     {
-        if (memcmp (&refOld, &m_vectPixelArray[i], sizeof(refOld)) == 0) // memcmp
+        int nCurLight = m_vectPixelArray[i].R + m_vectPixelArray[i].G + m_vectPixelArray[i].B;
+        if (nCurLight > nMidLight)
         {
-            m_vectPixelArray[i] = refNew; // memcpy
-            ++nPixelCount;
+            m_vectPixelArray[i] = refLightPixel;
         }
+        else 
+        {
+            m_vectPixelArray[i] = refDarkPixel;
+        }
+        ++nPixelCount;
     }
 
     return nPixelCount;

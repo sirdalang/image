@@ -138,9 +138,13 @@ int main(int argc, char *argv[])
     }
     RGBAprint (pPixel, nPixelSize, nW);
 
-    Image2RGBA_Pixel oldPixel = {0,0,0,0};
-    Image2RGBA_Pixel newPixel = {0,0,0,255};
-    image2rgba_replaceall (handle, &oldPixel, &newPixel);
+    // Image2RGBA_Pixel oldPixel = {0,0,0,0};
+    // Image2RGBA_Pixel newPixel = {0,0,0,255};
+    // image2rgba_replaceall (handle, &oldPixel, &newPixel);
+    Image2RGBA_Pixel darkPixel = {0,0,0,255};
+    Image2RGBA_Pixel lightPixel = {255,255,255,0};
+    Image2RGBA_Pixel midPixel = {128,128,128,0};
+    image2rgba_settotwocolor (handle, &lightPixel, &darkPixel, &midPixel);
 
     for (int y = 0; y < nH; ++y)
     {
@@ -160,7 +164,13 @@ int main(int argc, char *argv[])
     // bitprint (pPixel, nByteSize);
     // bitprint (pU1555Buf, nByteSize / 2);
 
-    C1555print (pU1555Buf, nByteSize, nW);
+    // C1555print (pU1555Buf, nByteSize / 2, nW);
+
+    // unsigned short u16OldPixel = 0x0000;
+    // unsigned short u16NewPixel = u16OldPixel | 0x8000;
+    // imagetools_replaceall (pU1555Buf, nW * nH, &u16OldPixel, &u16NewPixel, IMAGE_RAW_1555);
+
+    C1555print (pU1555Buf, nByteSize / 2, nW);
 
     free (pPixel);
     pPixel = NULL;

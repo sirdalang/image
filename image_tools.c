@@ -1,6 +1,7 @@
 #include "image_tools.h"
 
 #include <stdint.h>
+#include <string.h>
 
 #include "def_inner.h"
 
@@ -68,6 +69,44 @@ static int imagetools_rawconvert_RGBA_to_1555(const void *pSrc, unsigned int nSr
     return 0;
 }
 
+static int imagetools_rawreplace_1555(void *pPixels, unsigned int nPixelCount, 
+    const void *pOldPixel, const void *pNewPixel)
+{
+    U16_1555 *p16Src = (U16_1555 *)pPixels;
+
+    int i = 0;
+    int nCount = 0;
+    for (i = 0; i < nPixelCount; ++i)
+    {
+        if (memcmp (& p16Src[i], pOldPixel, sizeof(U16_1555)) == 0)
+        {
+            memcpy (& p16Src[i], pNewPixel, sizeof(U16_1555));
+            ++nCount;
+        }
+    }
+
+    return nCount;
+}
+
+static int imagetools_rawreplace_RGBA(void *pPixels, unsigned int nPixelCount, 
+    const void *pOldPixel, const void *pNewPixel)
+{
+    U32_RGBA *p32Src = (U32_RGBA *)pPixels;
+
+    int i = 0;
+    int nCount = 0;
+    for (i = 0; i < nPixelCount; ++i)
+    {
+        if (memcmp (& p32Src[i], pOldPixel, sizeof(U32_RGBA)) == 0)
+        {
+            memcpy (& p32Src[i], pNewPixel, sizeof(U32_RGBA));
+            ++nCount;
+        }
+    }
+
+    return nCount;
+}
+
 int imagetools_smallendian()
 {
     unsigned int u32 = 0x1;
@@ -96,6 +135,31 @@ int imagetools_rawconvert (const void *pSrc, unsigned int nSrcSize,
         default:
         {
             _error ("unexpected type=%d\n", eConvType);
+            break;
+        }
+    }
+    return ret;
+}
+
+int imagetools_replaceall (void *pPixels, unsigned int nPixelCount, 
+    const void *pOldPixel, const void *pNewPixel, IMAGE_RAW_TYPE_E eImageRawType)
+{
+    int ret = -1;
+    switch (eImageRawType)
+    {
+        case IMAGE_RAW_1555:
+        {
+            ret = imagetools_rawreplace_1555 (pPixels, nPixelCount, pOldPixel, pNewPixel);
+            break;   
+        }
+        case IMAGE_RAW_RGBA:
+        {
+            ret = imagetools_rawreplace_RGBA (pPixels, nPixelCount, pOldPixel, pNewPixel);
+            break;  
+        }
+        default:
+        {
+            _error ("unexpected type=%d\n", eImageRawType);
             break;
         }
     }

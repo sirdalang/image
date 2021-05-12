@@ -85,11 +85,12 @@ int image2rgba_getpixel(HANDLE_IMAGE2RGBA handle, int i, int j, Image2RGBA_Pixel
     return ret ? 0 : -1;
 }
 
-int image2rgba_replaceall(HANDLE_IMAGE2RGBA handle, const Image2RGBA_Pixel *cpOldPixel, const Image2RGBA_Pixel *cpNewPixel)
+int image2rgba_settotwocolor (HANDLE_IMAGE2RGBA handle, const Image2RGBA_Pixel *cpLightPixel, const Image2RGBA_Pixel *cpDarkPixel, 
+    const Image2RGBA_Pixel *cpMidPixel)
 {
     ImageInterface *pObj = static_cast<ImageInterface*> (handle);
 
-    int ret = pObj->ReplaceAllPixel (* cpOldPixel, * cpNewPixel);
+    int ret = pObj->SetToTwoColor (* cpLightPixel, * cpDarkPixel, * cpMidPixel);
 
     _debug ("replace %d pixels\n", ret);
 
