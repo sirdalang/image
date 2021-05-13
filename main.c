@@ -141,19 +141,19 @@ int main(int argc, char *argv[])
     // Image2RGBA_Pixel oldPixel = {0,0,0,0};
     // Image2RGBA_Pixel newPixel = {0,0,0,255};
     // image2rgba_replaceall (handle, &oldPixel, &newPixel);
-    Image2RGBA_Pixel darkPixel = {0,0,0,255};
-    Image2RGBA_Pixel lightPixel = {255,255,255,0};
-    Image2RGBA_Pixel midPixel = {128,128,128,0};
-    image2rgba_settotwocolor (handle, &lightPixel, &darkPixel, &midPixel);
+    // Image2RGBA_Pixel darkPixel = {0,0,0,255};
+    // Image2RGBA_Pixel lightPixel = {255,255,255,0};
+    // Image2RGBA_Pixel midPixel = {128,128,128,0};
+    // image2rgba_settotwocolor (handle, &lightPixel, &darkPixel, &midPixel);
 
-    for (int y = 0; y < nH; ++y)
-    {
-        for (int x = 0; x < nW; ++x)
-        {
-            image2rgba_getpixel (handle, x, y, & pPixel[x + y * nH]);
-        }
-    }
-    RGBAprint (pPixel, nPixelSize, nW);
+    // for (int y = 0; y < nH; ++y)
+    // {
+    //     for (int x = 0; x < nW; ++x)
+    //     {
+    //         image2rgba_getpixel (handle, x, y, & pPixel[x + y * nH]);
+    //     }
+    // }
+    // RGBAprint (pPixel, nPixelSize, nW);
 
     image2rgba_close (handle);
 
@@ -164,11 +164,11 @@ int main(int argc, char *argv[])
     // bitprint (pPixel, nByteSize);
     // bitprint (pU1555Buf, nByteSize / 2);
 
-    // C1555print (pU1555Buf, nByteSize / 2, nW);
+    C1555print (pU1555Buf, nByteSize / 2, nW);
 
-    // unsigned short u16OldPixel = 0x0000;
-    // unsigned short u16NewPixel = u16OldPixel | 0x8000;
-    // imagetools_replaceall (pU1555Buf, nW * nH, &u16OldPixel, &u16NewPixel, IMAGE_RAW_1555);
+    unsigned short u16OldPixel = 0x7FFF;
+    unsigned short u16NewPixel = u16OldPixel | 0xFFFF;
+    imagetools_replaceall (pU1555Buf, nW * nH, &u16OldPixel, &u16NewPixel, IMAGE_RAW_1555);
 
     C1555print (pU1555Buf, nByteSize / 2, nW);
 
@@ -177,7 +177,11 @@ int main(int argc, char *argv[])
     free (pU1555Buf);
     pU1555Buf = NULL;
 
-    
+    unsigned char u8Bitmap[6] = {0x0, 0xFF, 0xF0, 0x0F, 0x1, 0x80};
+    unsigned char u16Bitmap[96] = {};
+    imagetools_rawconvert (u8Bitmap, sizeof(u8Bitmap), u16Bitmap, sizeof(u16Bitmap), IMAGE_RAW_HBIT_1555_1BLACK_0ALPHA);
+
+    C1555print (& u16Bitmap, sizeof(u16Bitmap), 8);
 
     return 0;
 }
