@@ -101,6 +101,92 @@ int imagetools_rawconvert_HBIT_to_1555(const void *pSrc, unsigned int nSrcSize,
     return 0;
 }
 
+int imagetools_rawconvert_HBIT_to_RGBA(const void *pSrc, unsigned int nSrcSize, 
+    void *pDst, unsigned int nDstSize, const void *pPixelRGBA_0, const void *pPixelRGBA_1)
+{
+    const unsigned char bitmap[8] = {0x80,0x40,0x20,0x10,0x8,0x4,0x2,0x1};
+
+    UBYTE *p8Src = (UBYTE *)pSrc;
+    U32_RGBA *p32Dst = (U32_RGBA *)pDst;
+    U32_RGBA *p32PixelRGBA_0 = (U32_RGBA*)pPixelRGBA_0;
+    U32_RGBA *p32PixelRGBA_1 = (U32_RGBA*)pPixelRGBA_1;
+    unsigned int n8SrcSize = nSrcSize;
+    unsigned int n32DstSize = nDstSize / sizeof(U32_RGBA);
+
+    unsigned int i = 0;     
+    unsigned int j = 0;
+    for (i = 0,j = 0; i < n8SrcSize && j < n32DstSize; ++i)
+    {
+        for (int k = 0; k < 8 && j < n32DstSize; ++k, ++j)
+        {
+            if (p8Src[i] & bitmap[k])
+            {
+                p32Dst[j] = *(p32PixelRGBA_1);
+            }
+            else 
+            {
+                p32Dst[j] = *(p32PixelRGBA_0);
+            }
+        }
+    }
+
+    return 0;
+}
+
+int imagetools_scale_rgba(const void *pSrc, unsigned int nSrcW, unsigned int nSrcH, 
+    void *pDst, unsigned int nDstW, unsigned int nDstH)
+{
+    unsigned char *pre_lcd = (unsigned char *)pSrc;
+    unsigned int src_width = nSrcW;
+    unsigned int src_height = nSrcH;
+    unsigned int dst_width = nDstW;
+    unsigned int dst_height = nDstH;
+
+	int byte_size = sizeof(C_RGBA);
+ 
+	int hadd, wadd; //用于图像精确四舍五入的参数
+	unsigned char *buffer = (unsigned char *)pDst; //存储转化后的图像数据
+	memset(buffer, 0, dst_width * dst_height * byte_size); //对数组清零
+ 
+	double fw = (double)dst_width / src_width; //计算图像宽度缩放比例
+	double fh = (double)dst_height / src_height; //计算图像高度缩放比例
+ 
+	double fw_yu = fw - (int)fw; //求出缩放比例的小数部分
+	double fh_yu = fh - (int)fh;
+ 
+	int x,y;
+ 
+	for (unsigned int hnum = 0; hnum < dst_height; ++hnum) //按照从左到右，从上到下的顺序进行转换
+	{
+		y = round(hnum / fh);   //计算当前临近坐标的y值
+ 
+        if (y >= src_height)
+        {
+            y = src_height - 1;
+        }
+ 
+		for (unsigned int wnum = 0; wnum < dst_width; ++wnum)
+		{
+			x = round(wnum / fw); //计算当前临近坐标的x值
+ 
+            if (x >= src_width)
+            {
+                x = src_width - 1;
+            }
+ 
+			long pixel_point = hnum*dst_width*byte_size + wnum*byte_size; //计算转化后图像的数组偏移量
+ 
+			//RGB数据依次进行数据变换
+			buffer[pixel_point] = pre_lcd[y * src_width * byte_size + x * byte_size];
+			buffer[pixel_point + 1] = pre_lcd[y * src_width * byte_size + x * byte_size + 1];
+			buffer[pixel_point + 2] = pre_lcd[y * src_width * byte_size + x * byte_size + 2];
+            buffer[pixel_point + 3] = pre_lcd[y * src_width * byte_size + x * byte_size + 3];
+		}
+	}
+ 
+	return 0;
+}
+
 static int imagetools_rawreplace_RGBA(void *pPixels, unsigned int nPixelCount, 
     const void *pOldPixel, const void *pNewPixel)
 {
@@ -195,6 +281,27 @@ int imagetools_rawconvert (const void *pSrc, unsigned int nSrcSize,
         default:
         {
             _error ("unexpected type=%d\n", eConvType);
+            break;
+        }
+    }
+    return ret;
+}
+
+
+int imagetools_scale(const void *pSrc, unsigned int nSrcW, unsigned int nSrcH, 
+    void *pDst, unsigned int nDstW, unsigned int nDstH, IMAGE_RAW_TYPE_E eImageRawType)
+{
+    int ret = -1;
+    switch (eImageRawType)
+    {
+        case IMAGE_RAW_RGBA:
+        {
+            ret = imagetools_scale_rgba (pSrc, nSrcW, nSrcH, pDst, nDstW, nDstH);
+            break;  
+        }
+        default:
+        {
+            _error ("unexpected type=%d\n", eImageRawType);
             break;
         }
     }

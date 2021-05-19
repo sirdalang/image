@@ -10,7 +10,9 @@
 
 #include "image2rgba.h"
 
+#ifndef DEBUG
 #define DEBUG
+#endif 
 
 #ifdef DEBUG
 #define _debug(x...) do {printf("[debug][%s %d %s]", \

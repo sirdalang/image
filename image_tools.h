@@ -36,6 +36,12 @@ int imagetools_rawconvert (const void *pSrc, unsigned int nSrcSize,
 int imagetools_rawconvert_HBIT_to_1555(const void *pSrc, unsigned int nSrcSize, 
     void *pDst, unsigned int nDstSize, const void *pPixel1555_0, const void *pPixel1555_1);
 
+int imagetools_rawconvert_HBIT_to_RGBA(const void *pSrc, unsigned int nSrcSize, 
+    void *pDst, unsigned int nDstSize, const void *pPixelRGBA_0, const void *pPixelRGBA_1);
+
+int imagetools_scale(const void *pSrc, unsigned int nSrcW, unsigned int nSrcH, 
+    void *pDst, unsigned int nDstW, unsigned int nDstH, IMAGE_RAW_TYPE_E eImageRawType);
+
 int imagetools_smallendian();
 
 int imagetools_replaceall (void *pPixels, unsigned int nPixelCount, 

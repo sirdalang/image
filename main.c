@@ -136,6 +136,7 @@ int main(int argc, char *argv[])
             image2rgba_getpixel (handle, x, y, & pPixel[x + y * nH]);
         }
     }
+    _debug ("original:\n");
     RGBAprint (pPixel, nPixelSize, nW);
 
     // Image2RGBA_Pixel oldPixel = {0,0,0,0};
@@ -157,7 +158,15 @@ int main(int argc, char *argv[])
 
     image2rgba_close (handle);
 
-    void *pU1555Buf = malloc (nByteSize / 2);
+    /* scale test */
+    Image2RGBA_Pixel *pRGBAScaled = (Image2RGBA_Pixel *)malloc (nByteSize * 4);
+
+    imagetools_scale (pPixel, nW, nH, pRGBAScaled, nW + 1, nH + 1, IMAGE_RAW_RGBA);
+
+    _debug ("scaled:\n");
+    RGBAprint (pRGBAScaled, (nW + 1) * (nH + 1), nW + 1);
+
+    void *pU1555Buf = malloc (nByteSize);
 
     imagetools_rawconvert (pPixel, nByteSize, pU1555Buf, nByteSize / 2, IMAGE_RAW_RGBA_1555);
 
@@ -182,6 +191,14 @@ int main(int argc, char *argv[])
     imagetools_rawconvert (u8Bitmap, sizeof(u8Bitmap), u16Bitmap, sizeof(u16Bitmap), IMAGE_RAW_HBIT_1555_1BLACK_0ALPHA);
 
     C1555print (& u16Bitmap, sizeof(u16Bitmap), 8);
+
+    Image2RGBA_Pixel u32Bitmap[48] = {};
+    Image2RGBA_Pixel pixel1 = {0xFF,0xFF,0xFF,0};
+    Image2RGBA_Pixel pixel0 = {};
+    imagetools_rawconvert_HBIT_to_RGBA (u8Bitmap, sizeof(u8Bitmap), u32Bitmap, sizeof(u32Bitmap),
+        & pixel0, & pixel1);
+
+    RGBAprint (u32Bitmap, 48, 8);
 
     return 0;
 }
