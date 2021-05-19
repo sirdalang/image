@@ -11,8 +11,6 @@ CP=cp -v
 $(TARGET): $(CONFIGURE) | $(BUILD_DIR) $(OUTPUT_DIR)
 	make -C $(BUILD_DIR) -j4
 	make -C $(BUILD_DIR) install
-	$(CP) output/include/* ../../include/jpeglib/
-	$(CP) output/lib/libjpeg.a ../../lib/
 
 $(BUILD_DIR):
 	$(MKDIR) $@
