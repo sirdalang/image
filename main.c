@@ -139,22 +139,12 @@ int main(int argc, char *argv[])
     _debug ("original:\n");
     RGBAprint (pPixel, nPixelSize, nW);
 
-    // Image2RGBA_Pixel oldPixel = {0,0,0,0};
-    // Image2RGBA_Pixel newPixel = {0,0,0,255};
-    // image2rgba_replaceall (handle, &oldPixel, &newPixel);
-    // Image2RGBA_Pixel darkPixel = {0,0,0,255};
-    // Image2RGBA_Pixel lightPixel = {255,255,255,0};
-    // Image2RGBA_Pixel midPixel = {128,128,128,0};
-    // image2rgba_settotwocolor (handle, &lightPixel, &darkPixel, &midPixel);
+    Image2RGBA_Pixel pixelBack = {0,0,0,0};
+    Image2RGBA_Pixel pixelBackTo = {0,0,0,255};
+    Image2RGBA_Pixel pixelFrontTo = {255,255,255,0};
+    imagetools_settwocolor (pPixel, nW * nH, &pixelBack, &pixelBackTo, &pixelFrontTo, IMAGE_RAW_RGBA);
 
-    // for (int y = 0; y < nH; ++y)
-    // {
-    //     for (int x = 0; x < nW; ++x)
-    //     {
-    //         image2rgba_getpixel (handle, x, y, & pPixel[x + y * nH]);
-    //     }
-    // }
-    // RGBAprint (pPixel, nPixelSize, nW);
+    RGBAprint (pPixel, nPixelSize, nW);
 
     image2rgba_close (handle);
 

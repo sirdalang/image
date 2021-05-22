@@ -47,6 +47,9 @@ int imagetools_smallendian();
 int imagetools_replaceall (void *pPixels, unsigned int nPixelCount, 
     const void *pOldPixel, const void *pNewPixel, IMAGE_RAW_TYPE_E eImageRawType);
 
+int imagetools_settwocolor (void *pPixels, unsigned int nPixelCount, 
+    const void *pBackColor, const void *pBackToColor, const void* pFrontToColor, IMAGE_RAW_TYPE_E eImageRawType);
+
 #ifdef __cplusplus
 }
 #endif

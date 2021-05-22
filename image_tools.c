@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <string.h>
+#include <math.h>
 
 #include "def_inner.h"
 
@@ -144,17 +145,17 @@ int imagetools_scale_rgba(const void *pSrc, unsigned int nSrcW, unsigned int nSr
 
 	int byte_size = sizeof(C_RGBA);
  
-	int hadd, wadd; //用于图像精确四舍五入的参数
+	// int hadd, wadd; //用于图像精确四舍五入的参数
 	unsigned char *buffer = (unsigned char *)pDst; //存储转化后的图像数据
 	memset(buffer, 0, dst_width * dst_height * byte_size); //对数组清零
  
 	double fw = (double)dst_width / src_width; //计算图像宽度缩放比例
 	double fh = (double)dst_height / src_height; //计算图像高度缩放比例
  
-	double fw_yu = fw - (int)fw; //求出缩放比例的小数部分
-	double fh_yu = fh - (int)fh;
+	// double fw_yu = fw - (int)fw; //求出缩放比例的小数部分
+	// double fh_yu = fh - (int)fh;
  
-	int x,y;
+	unsigned int x=0,y=0;
  
 	for (unsigned int hnum = 0; hnum < dst_height; ++hnum) //按照从左到右，从上到下的顺序进行转换
 	{
@@ -323,6 +324,49 @@ int imagetools_replaceall (void *pPixels, unsigned int nPixelCount,
         {
             ret = imagetools_rawreplace_RGBA (pPixels, nPixelCount, pOldPixel, pNewPixel);
             break;  
+        }
+        default:
+        {
+            _error ("unexpected type=%d\n", eImageRawType);
+            break;
+        }
+    }
+    return ret;
+}
+
+static int imagetools_settwocolor_rgba (void *pPixels, unsigned int nPixelCount, 
+    const void *pBackColor, const void *pBackToColor, const void* pFrontToColor)
+{
+    U32_RGBA *pRGBAPixel = (U32_RGBA *)pPixels;
+    U32_RGBA *pRGBAPixel_Back = (U32_RGBA *)pBackColor;
+    U32_RGBA *pRGBAPixel_BackTo = (U32_RGBA *)pBackToColor;
+    U32_RGBA *pRGBAPixel_FrontTo = (U32_RGBA *)pFrontToColor;
+
+    for (unsigned int i = 0; i < nPixelCount; ++i)
+    {
+        if (pRGBAPixel[i] == *pRGBAPixel_Back)
+        {
+            pRGBAPixel[i] = *pRGBAPixel_BackTo;
+        }
+        else 
+        {
+            pRGBAPixel[i] = *pRGBAPixel_FrontTo;
+        }
+    }
+
+    return 0;
+}
+
+int imagetools_settwocolor (void *pPixels, unsigned int nPixelCount, 
+    const void *pBackColor, const void *pBackToColor, const void* pFrontToColor, IMAGE_RAW_TYPE_E eImageRawType)
+{
+    int ret = -1;
+    switch (eImageRawType)
+    {
+        case IMAGE_RAW_RGBA:
+        {
+            ret = imagetools_settwocolor_rgba (pPixels, nPixelCount, pBackColor, pBackToColor, pFrontToColor);
+            break;
         }
         default:
         {
