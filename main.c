@@ -99,6 +99,20 @@ static void C1555print(const void *pData, int nSize, int nWidth)
     printf ("\n");
 }
 
+static void fun_with_flags (Image2RGBA_Pixel *pixels, int nWidth, int nHeight)
+{
+    int n1555Size = nWidth * nHeight * 2;
+    void *p1555Buf = malloc (n1555Size);
+
+    imagetools_rawconvert (pixels, nWidth * nHeight * sizeof(Image2RGBA_Pixel), p1555Buf, n1555Size, IMAGE_RAW_RGBA_1555);
+    C1555print (p1555Buf, n1555Size, nWidth);
+
+    unsigned short sPixel1555[36] = {};
+
+    imagetools_drawimage (& sPixel1555, 6, 6, p1555Buf, nWidth, nHeight, 4, 4, IMAGE_RAW_1555);
+    C1555print (sPixel1555, sizeof(sPixel1555), 6);
+}
+
 int main(int argc, char *argv[])
 {
     if (argc != 2)
@@ -139,56 +153,12 @@ int main(int argc, char *argv[])
     _debug ("original:\n");
     RGBAprint (pPixel, nPixelSize, nW);
 
-    Image2RGBA_Pixel pixelBack = {0,0,0,0};
-    Image2RGBA_Pixel pixelBackTo = {0,0,0,255};
-    Image2RGBA_Pixel pixelFrontTo = {255,255,255,0};
-    imagetools_settwocolor (pPixel, nW * nH, &pixelBack, &pixelBackTo, &pixelFrontTo, IMAGE_RAW_RGBA);
-
-    RGBAprint (pPixel, nPixelSize, nW);
-
     image2rgba_close (handle);
 
-    /* scale test */
-    Image2RGBA_Pixel *pRGBAScaled = (Image2RGBA_Pixel *)malloc (nByteSize * 4);
-
-    imagetools_scale (pPixel, nW, nH, pRGBAScaled, nW + 1, nH + 1, IMAGE_RAW_RGBA);
-
-    _debug ("scaled:\n");
-    RGBAprint (pRGBAScaled, (nW + 1) * (nH + 1), nW + 1);
-
-    void *pU1555Buf = malloc (nByteSize);
-
-    imagetools_rawconvert (pPixel, nByteSize, pU1555Buf, nByteSize / 2, IMAGE_RAW_RGBA_1555);
-
-    // bitprint (pPixel, nByteSize);
-    // bitprint (pU1555Buf, nByteSize / 2);
-
-    C1555print (pU1555Buf, nByteSize / 2, nW);
-
-    unsigned short u16OldPixel = 0x7FFF;
-    unsigned short u16NewPixel = u16OldPixel | 0xFFFF;
-    imagetools_replaceall (pU1555Buf, nW * nH, &u16OldPixel, &u16NewPixel, IMAGE_RAW_1555);
-
-    C1555print (pU1555Buf, nByteSize / 2, nW);
+    fun_with_flags (pPixel, nW, nH);
 
     free (pPixel);
     pPixel = NULL;
-    free (pU1555Buf);
-    pU1555Buf = NULL;
-
-    unsigned char u8Bitmap[6] = {0x0, 0xFF, 0xF0, 0x0F, 0x1, 0x80};
-    unsigned char u16Bitmap[96] = {};
-    imagetools_rawconvert (u8Bitmap, sizeof(u8Bitmap), u16Bitmap, sizeof(u16Bitmap), IMAGE_RAW_HBIT_1555_1BLACK_0ALPHA);
-
-    C1555print (& u16Bitmap, sizeof(u16Bitmap), 8);
-
-    Image2RGBA_Pixel u32Bitmap[48] = {};
-    Image2RGBA_Pixel pixel1 = {0xFF,0xFF,0xFF,0};
-    Image2RGBA_Pixel pixel0 = {};
-    imagetools_rawconvert_HBIT_to_RGBA (u8Bitmap, sizeof(u8Bitmap), u32Bitmap, sizeof(u32Bitmap),
-        & pixel0, & pixel1);
-
-    RGBAprint (u32Bitmap, 48, 8);
 
     return 0;
 }

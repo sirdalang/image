@@ -34,6 +34,20 @@ typedef struct C_1555_BigEndian
     UBYTE blue:5;
 }  __attribute__((packed)) C_1555_BigEndian;
 
+static int imagetools_smallendian()
+{
+    unsigned int u32 = 0x1;
+    char *pu8 = (char*)&u32;
+    if (*pu8)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
 static int imagetools_rawconvert_RGBA_to_1555(const void *pSrc, unsigned int nSrcSize, 
     void *pDst, unsigned int nDstSize)
 {
@@ -226,20 +240,6 @@ static int imagetools_rawreplace_1555(void *pPixels, unsigned int nPixelCount,
     return nCount;
 }
 
-int imagetools_smallendian()
-{
-    unsigned int u32 = 0x1;
-    char *pu8 = (char*)&u32;
-    if (*pu8)
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
-}
-
 int imagetools_rawconvert (const void *pSrc, unsigned int nSrcSize, 
     void *pDst, unsigned int nDstSize, IMAGE_RAW_CONVERT_TYPE_E eConvType)
 {
@@ -366,6 +366,65 @@ int imagetools_settwocolor (void *pPixels, unsigned int nPixelCount,
         case IMAGE_RAW_RGBA:
         {
             ret = imagetools_settwocolor_rgba (pPixels, nPixelCount, pBackColor, pBackToColor, pFrontToColor);
+            break;
+        }
+        default:
+        {
+            _error ("unexpected type=%d\n", eImageRawType);
+            break;
+        }
+    }
+    return ret;
+}
+
+static int imagetools_drawimage_1555 (void *pDstPixels, unsigned int nDstWidth, unsigned int nDstHeight, 
+    const void *pSrcPixels, unsigned int nSrcWidth, unsigned int nSrcHeight, 
+    int nSrcX, int nSrcY)
+{
+    U16_1555 *p16DstPixels1555 = (U16_1555 *)pDstPixels;
+    U16_1555 *p16SrcPixels1555 = (U16_1555 *)pSrcPixels;
+
+    for (unsigned int ySrc = 0; ySrc < nSrcHeight; ++ySrc)
+    {
+        for (unsigned int xSrc = 0; xSrc < nSrcWidth; ++xSrc)
+        {
+            int xDst = (int)(xSrc + nSrcX);
+            int yDst = (int)(ySrc + nSrcY);
+
+            if (xDst < 0 || xDst > (int)nDstWidth
+                    || yDst < 0 || yDst > (int)nDstHeight)
+            {
+                continue ;
+            }
+
+            int nDstIndex = xDst + yDst * nDstWidth;
+            int nSrcIndex = xSrc + ySrc * nSrcWidth;
+
+            if (nDstIndex >= (int)(nDstWidth * nDstHeight) ||
+                nSrcIndex >= (int)(nSrcWidth * nSrcHeight))
+            {
+                _error ("inner error\n");
+                continue;
+            }
+
+            p16DstPixels1555[nDstIndex] = p16SrcPixels1555[nSrcIndex];
+        }
+    }
+
+    return 0;
+}
+
+int imagetools_drawimage (void *pDstPixels, unsigned int nDstWidth, unsigned int nDstHeight, 
+    const void *pSrcPixels, unsigned int nSrcWidth, unsigned int nSrcHeight, 
+    int nSrcX, int nSrcY, IMAGE_RAW_TYPE_E eImageRawType)
+{
+    int ret = -1;
+    switch (eImageRawType)
+    {
+        case IMAGE_RAW_1555:
+        {
+            ret = imagetools_drawimage_1555 (pDstPixels, nDstWidth, nDstHeight, 
+                            pSrcPixels, nSrcWidth, nSrcHeight, nSrcX, nSrcY);
             break;
         }
         default:

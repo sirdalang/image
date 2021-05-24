@@ -42,13 +42,15 @@ int imagetools_rawconvert_HBIT_to_RGBA(const void *pSrc, unsigned int nSrcSize,
 int imagetools_scale(const void *pSrc, unsigned int nSrcW, unsigned int nSrcH, 
     void *pDst, unsigned int nDstW, unsigned int nDstH, IMAGE_RAW_TYPE_E eImageRawType);
 
-int imagetools_smallendian();
-
 int imagetools_replaceall (void *pPixels, unsigned int nPixelCount, 
     const void *pOldPixel, const void *pNewPixel, IMAGE_RAW_TYPE_E eImageRawType);
 
 int imagetools_settwocolor (void *pPixels, unsigned int nPixelCount, 
     const void *pBackColor, const void *pBackToColor, const void* pFrontToColor, IMAGE_RAW_TYPE_E eImageRawType);
+
+int imagetools_drawimage (void *pDstPixels, unsigned int nDstWidth, unsigned int nDstHeight, 
+    const void *pSrcPixels, unsigned int nSrcWidth, unsigned int nSrcHeight, 
+    int nSrcX, int nSrcY, IMAGE_RAW_TYPE_E eImageRawType);
 
 #ifdef __cplusplus
 }
