@@ -377,9 +377,53 @@ int imagetools_settwocolor (void *pPixels, unsigned int nPixelCount,
     return ret;
 }
 
+static U16_1555 imagetools_mixto_1555(U16_1555 pixel1555_Board, U16_1555 pixel1555_Paint)
+{
+    int bSmallEndian = imagetools_smallendian();
+    U16_1555 pixelMixed = 0;
+
+    int bPaintTransparent = FALSE;
+
+    if (bSmallEndian)
+    {
+        const C_1555_SmallEndian* p1555Paint = (const C_1555_SmallEndian*)& pixel1555_Paint;
+        if (1 == p1555Paint->alpha)
+        {
+            bPaintTransparent = TRUE;
+        }
+        else 
+        {
+            bPaintTransparent = FALSE;
+        }
+    }
+    else 
+    {
+        const C_1555_BigEndian* p1555Paint = (const C_1555_BigEndian*)& pixel1555_Paint;
+        if (1 == p1555Paint->alpha)
+        {
+            bPaintTransparent = TRUE;
+        }
+        else 
+        {
+            bPaintTransparent = FALSE;
+        }
+    }
+
+    if (bPaintTransparent)
+    {
+        pixelMixed = pixel1555_Board;
+    }
+    else 
+    {
+        pixelMixed = pixel1555_Paint;
+    }
+
+    return pixelMixed;
+}
+
 static int imagetools_drawimage_1555 (void *pDstPixels, unsigned int nDstWidth, unsigned int nDstHeight, 
     const void *pSrcPixels, unsigned int nSrcWidth, unsigned int nSrcHeight, 
-    int nSrcX, int nSrcY)
+    int nSrcX, int nSrcY, IMAGE_DRAW_MODE eDrawMode)
 {
     U16_1555 *p16DstPixels1555 = (U16_1555 *)pDstPixels;
     U16_1555 *p16SrcPixels1555 = (U16_1555 *)pSrcPixels;
@@ -391,8 +435,8 @@ static int imagetools_drawimage_1555 (void *pDstPixels, unsigned int nDstWidth, 
             int xDst = (int)(xSrc + nSrcX);
             int yDst = (int)(ySrc + nSrcY);
 
-            if (xDst < 0 || xDst > (int)nDstWidth
-                    || yDst < 0 || yDst > (int)nDstHeight)
+            if (xDst < 0 || xDst >= (int)nDstWidth
+                    || yDst < 0 || yDst >= (int)nDstHeight)
             {
                 continue ;
             }
@@ -407,7 +451,21 @@ static int imagetools_drawimage_1555 (void *pDstPixels, unsigned int nDstWidth, 
                 continue;
             }
 
-            p16DstPixels1555[nDstIndex] = p16SrcPixels1555[nSrcIndex];
+            switch (eDrawMode)
+            {
+                case IMAGE_DRAW_MIX:
+                {
+                    p16DstPixels1555[nDstIndex] = imagetools_mixto_1555(p16DstPixels1555[nDstIndex],
+                                            p16SrcPixels1555[nSrcIndex]);
+                    break;
+                }
+                case IMAGE_DRAW_COVER:
+                default:
+                {
+                    p16DstPixels1555[nDstIndex] = p16SrcPixels1555[nSrcIndex];
+                    break;
+                }
+            }
         }
     }
 
@@ -416,7 +474,7 @@ static int imagetools_drawimage_1555 (void *pDstPixels, unsigned int nDstWidth, 
 
 int imagetools_drawimage (void *pDstPixels, unsigned int nDstWidth, unsigned int nDstHeight, 
     const void *pSrcPixels, unsigned int nSrcWidth, unsigned int nSrcHeight, 
-    int nSrcX, int nSrcY, IMAGE_RAW_TYPE_E eImageRawType)
+    int nSrcX, int nSrcY, IMAGE_DRAW_MODE eDrawMode, IMAGE_RAW_TYPE_E eImageRawType)
 {
     int ret = -1;
     switch (eImageRawType)
@@ -424,7 +482,7 @@ int imagetools_drawimage (void *pDstPixels, unsigned int nDstWidth, unsigned int
         case IMAGE_RAW_1555:
         {
             ret = imagetools_drawimage_1555 (pDstPixels, nDstWidth, nDstHeight, 
-                            pSrcPixels, nSrcWidth, nSrcHeight, nSrcX, nSrcY);
+                            pSrcPixels, nSrcWidth, nSrcHeight, nSrcX, nSrcY, eDrawMode);
             break;
         }
         default:

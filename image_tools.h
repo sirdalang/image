@@ -26,6 +26,12 @@ typedef enum
     IMAGE_RAW_1555,
 } IMAGE_RAW_TYPE_E;
 
+typedef enum
+{
+    IMAGE_DRAW_COVER = 0,
+    IMAGE_DRAW_MIX
+} IMAGE_DRAW_MODE;
+
 #ifdef __cplusplus
 extern "C" {
 #endif 
@@ -50,7 +56,7 @@ int imagetools_settwocolor (void *pPixels, unsigned int nPixelCount,
 
 int imagetools_drawimage (void *pDstPixels, unsigned int nDstWidth, unsigned int nDstHeight, 
     const void *pSrcPixels, unsigned int nSrcWidth, unsigned int nSrcHeight, 
-    int nSrcX, int nSrcY, IMAGE_RAW_TYPE_E eImageRawType);
+    int nSrcX, int nSrcY, IMAGE_DRAW_MODE eDrawMode, IMAGE_RAW_TYPE_E eImageRawType);
 
 #ifdef __cplusplus
 }

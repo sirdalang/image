@@ -99,7 +99,7 @@ static void C1555print(const void *pData, int nSize, int nWidth)
     printf ("\n");
 }
 
-static void fun_with_flags (Image2RGBA_Pixel *pixels, int nWidth, int nHeight)
+static void fun_with_drawA (Image2RGBA_Pixel *pixels, int nWidth, int nHeight)
 {
     int n1555Size = nWidth * nHeight * 2;
     void *p1555Buf = malloc (n1555Size);
@@ -108,9 +108,33 @@ static void fun_with_flags (Image2RGBA_Pixel *pixels, int nWidth, int nHeight)
     C1555print (p1555Buf, n1555Size, nWidth);
 
     unsigned short sPixel1555[36] = {};
-
-    imagetools_drawimage (& sPixel1555, 6, 6, p1555Buf, nWidth, nHeight, 4, 4, IMAGE_RAW_1555);
+    for (int i = 0; i < 36; ++i)
+    {
+        sPixel1555[i] = 0x1111;
+    }
     C1555print (sPixel1555, sizeof(sPixel1555), 6);
+
+    imagetools_drawimage (& sPixel1555, 6, 6, p1555Buf, nWidth, nHeight, 1, 1, IMAGE_DRAW_COVER, IMAGE_RAW_1555);
+    C1555print (sPixel1555, sizeof(sPixel1555), 6);
+}
+
+static void fun_with_drawB ()
+{
+    unsigned short sPixel1555_Src[4] = {
+        0x8111,0x7111,0x8111,0x7111
+    };
+    C1555print (sPixel1555_Src, sizeof(sPixel1555_Src), 2);
+
+    unsigned short sPixel1555_Board[36] = {};
+    for (int i = 0; i < 36; ++i)
+    {
+        sPixel1555_Board[i] = 0x1111;
+    }
+    
+    C1555print (sPixel1555_Board, sizeof(sPixel1555_Board), 6);
+
+    imagetools_drawimage (& sPixel1555_Board, 6, 6, &sPixel1555_Src, 2, 2, 1, 1, IMAGE_DRAW_MIX, IMAGE_RAW_1555);
+    C1555print (sPixel1555_Board, sizeof(sPixel1555_Board), 6);
 }
 
 int main(int argc, char *argv[])
@@ -155,7 +179,7 @@ int main(int argc, char *argv[])
 
     image2rgba_close (handle);
 
-    fun_with_flags (pPixel, nW, nH);
+    fun_with_drawB ();
 
     free (pPixel);
     pPixel = NULL;
