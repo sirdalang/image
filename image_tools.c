@@ -423,7 +423,7 @@ static U16_1555 imagetools_mixto_1555(U16_1555 pixel1555_Board, U16_1555 pixel15
 
 static int imagetools_drawimage_1555 (void *pDstPixels, unsigned int nDstWidth, unsigned int nDstHeight, 
     const void *pSrcPixels, unsigned int nSrcWidth, unsigned int nSrcHeight, 
-    int nSrcX, int nSrcY, IMAGE_DRAW_MODE eDrawMode)
+    int nX, int nY, IMAGE_DRAW_MODE eDrawMode)
 {
     U16_1555 *p16DstPixels1555 = (U16_1555 *)pDstPixels;
     U16_1555 *p16SrcPixels1555 = (U16_1555 *)pSrcPixels;
@@ -432,8 +432,8 @@ static int imagetools_drawimage_1555 (void *pDstPixels, unsigned int nDstWidth, 
     {
         for (unsigned int xSrc = 0; xSrc < nSrcWidth; ++xSrc)
         {
-            int xDst = (int)(xSrc + nSrcX);
-            int yDst = (int)(ySrc + nSrcY);
+            int xDst = (int)(xSrc + nX);
+            int yDst = (int)(ySrc + nY);
 
             if (xDst < 0 || xDst >= (int)nDstWidth
                     || yDst < 0 || yDst >= (int)nDstHeight)
@@ -472,9 +472,60 @@ static int imagetools_drawimage_1555 (void *pDstPixels, unsigned int nDstWidth, 
     return 0;
 }
 
+static int imagetools_brushrect_1555 (void *pDstPixels, unsigned int nDstWidth, unsigned int nDstHeight,
+    const void *pSrcPixels, unsigned int nSrcWidth, unsigned int nSrcHeight, 
+    int nX, int nY, IMAGE_DRAW_MODE eDrawMode)
+{
+    U16_1555 *p16DstPixels1555 = (U16_1555 *)pDstPixels;
+    U16_1555 u16SrcPixel1555 = *(U16_1555 *)pSrcPixels;
+
+    for (unsigned int ySrc = 0; ySrc < nSrcHeight; ++ySrc)
+    {
+        for (unsigned int xSrc = 0; xSrc < nSrcWidth; ++xSrc)
+        {
+            int xDst = (int)(xSrc + nX);
+            int yDst = (int)(ySrc + nY);
+
+            if (xDst < 0 || xDst >= (int)nDstWidth
+                    || yDst < 0 || yDst >= (int)nDstHeight)
+            {
+                continue ;
+            }
+
+            int nDstIndex = xDst + yDst * nDstWidth;
+            int nSrcIndex = xSrc + ySrc * nSrcWidth;
+
+            if (nDstIndex >= (int)(nDstWidth * nDstHeight) ||
+                nSrcIndex >= (int)(nSrcWidth * nSrcHeight))
+            {
+                _error ("inner error\n");
+                continue;
+            }
+
+            switch (eDrawMode)
+            {
+                case IMAGE_DRAW_MIX:
+                {
+                    p16DstPixels1555[nDstIndex] = imagetools_mixto_1555(p16DstPixels1555[nDstIndex],
+                                            u16SrcPixel1555);
+                    break;
+                }
+                case IMAGE_DRAW_COVER:
+                default:
+                {
+                    p16DstPixels1555[nDstIndex] = u16SrcPixel1555;
+                    break;
+                }
+            }
+        }
+    }
+
+    return 0;
+}
+
 int imagetools_drawimage (void *pDstPixels, unsigned int nDstWidth, unsigned int nDstHeight, 
     const void *pSrcPixels, unsigned int nSrcWidth, unsigned int nSrcHeight, 
-    int nSrcX, int nSrcY, IMAGE_DRAW_MODE eDrawMode, IMAGE_RAW_TYPE_E eImageRawType)
+    int nX, int nY, IMAGE_DRAW_MODE eDrawMode, IMAGE_RAW_TYPE_E eImageRawType)
 {
     int ret = -1;
     switch (eImageRawType)
@@ -482,7 +533,29 @@ int imagetools_drawimage (void *pDstPixels, unsigned int nDstWidth, unsigned int
         case IMAGE_RAW_1555:
         {
             ret = imagetools_drawimage_1555 (pDstPixels, nDstWidth, nDstHeight, 
-                            pSrcPixels, nSrcWidth, nSrcHeight, nSrcX, nSrcY, eDrawMode);
+                            pSrcPixels, nSrcWidth, nSrcHeight, nX, nY, eDrawMode);
+            break;
+        }
+        default:
+        {
+            _error ("unexpected type=%d\n", eImageRawType);
+            break;
+        }
+    }
+    return ret;
+}
+
+int imagetools_brushrect (void *pDstPixels, unsigned int nDstWidth, unsigned int nDstHeight,
+    const void *pSrcPixels, unsigned int nSrcWidth, unsigned int nSrcHeight, 
+    int nX, int nY, IMAGE_DRAW_MODE eDrawMode, IMAGE_RAW_TYPE_E eImageRawType)
+{
+    int ret = -1;
+    switch (eImageRawType)
+    {
+        case IMAGE_RAW_1555:
+        {
+            ret = imagetools_brushrect_1555 (pDstPixels, nDstWidth, nDstHeight, 
+                            pSrcPixels, nSrcWidth, nSrcHeight, nX, nY, eDrawMode);
             break;
         }
         default:

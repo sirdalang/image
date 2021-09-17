@@ -137,6 +137,20 @@ static void fun_with_drawB ()
     C1555print (sPixel1555_Board, sizeof(sPixel1555_Board), 6);
 }
 
+static void fun_with_drawC()
+{
+    unsigned short sPixel1555_Brush = 0x2222;
+    unsigned short sPixel1555_Board[36] = {};
+    for (int i = 0; i < 36; ++i)
+    {
+        sPixel1555_Board[i] = 0x1111;
+    }
+    
+    C1555print (sPixel1555_Board, sizeof(sPixel1555_Board), 6);
+    imagetools_brushrect (& sPixel1555_Board, 6, 6, & sPixel1555_Brush, 2, 2, 0, 0, IMAGE_DRAW_COVER, IMAGE_RAW_1555);
+    C1555print (sPixel1555_Board, sizeof(sPixel1555_Board), 6);
+}
+
 int main(int argc, char *argv[])
 {
     if (argc != 2)
@@ -179,7 +193,8 @@ int main(int argc, char *argv[])
 
     image2rgba_close (handle);
 
-    fun_with_drawB ();
+    // fun_with_drawB ();
+    fun_with_drawC ();
 
     free (pPixel);
     pPixel = NULL;

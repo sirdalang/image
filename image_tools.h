@@ -56,7 +56,11 @@ int imagetools_settwocolor (void *pPixels, unsigned int nPixelCount,
 
 int imagetools_drawimage (void *pDstPixels, unsigned int nDstWidth, unsigned int nDstHeight, 
     const void *pSrcPixels, unsigned int nSrcWidth, unsigned int nSrcHeight, 
-    int nSrcX, int nSrcY, IMAGE_DRAW_MODE eDrawMode, IMAGE_RAW_TYPE_E eImageRawType);
+    int nX, int nY, IMAGE_DRAW_MODE eDrawMode, IMAGE_RAW_TYPE_E eImageRawType);
+
+int imagetools_brushrect (void *pDstPixels, unsigned int nDstWidth, unsigned int nDstHeight,
+    const void *pSrcPixels, unsigned int nSrcWidth, unsigned int nSrcHeight, 
+    int nX, int nY, IMAGE_DRAW_MODE eDrawMode, IMAGE_RAW_TYPE_E eImageRawType);
 
 #ifdef __cplusplus
 }
