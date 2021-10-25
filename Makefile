@@ -19,7 +19,16 @@ AR = ar -rcs
 MKDIR = mkdir
 
 CFLAGS = -g -Wall $(DIR_INC)
-LFLAGS = -L$(DIR_LIB) -leasybmp -ljpeg
+LFLAGS = -L$(DIR_LIB) -leasybmp
+
+support_jpeg = false
+
+ifeq ($(support_jpeg),yes)
+CFLAGS += -DSUPPORT_JPG
+LFLAGS += -ljpeg
+endif
+
+CFLAGS += -ffunction-sections -fdata-sections
 
 $(BIN_TARGET):$(OBJ) | $(DIR_LIB)
 	$(CC) -o $@ $(OBJ) $(LFLAGS)

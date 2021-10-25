@@ -5,10 +5,14 @@
 #include <setjmp.h>
 
 #include "def_inner.h"
+
+#ifdef SUPPORT_JPG
 #include "jpeglib.h"
+#endif // SUPPORT_JPG
 
 IMAGE_NAME_IMPORT;
 
+#ifdef SUPPORT_JPG
 struct my_error_mgr {
   struct jpeg_error_mgr pub;	/* "public" fields */
 
@@ -30,17 +34,21 @@ my_error_exit (j_common_ptr cinfo)
   /* Return control to the setjmp point */
   longjmp(myerr->setjmp_buffer, 1);
 }
+#endif // SUPPORT_JPG
 
 bool ImageJpeg::LoadFile_override()
 {
     bool ret = false;
 
+#ifdef SUPPORT_JPG
     struct jpeg_decompress_struct cinfo = {};
     struct my_error_mgr cmyerr = {};
     FILE* fp = NULL;
+#endif // SUPPORT_JPG
 
     do 
     {
+#ifdef SUPPORT_JPG
         /* open file */
         if ((fp = fopen (m_strFileName.c_str(), "rb")) == NULL)
         {
@@ -131,6 +139,7 @@ bool ImageJpeg::LoadFile_override()
         fp = NULL;
 
         ret = true;
+#endif // SUPPORT_JPG
     }
     while (0);
 

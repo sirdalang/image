@@ -164,6 +164,10 @@ bool ImageInterface::CheckOrLoadFile ()
         m_bFileLoaded = true;
         return true;
     }
+    else 
+    {
+        _error ("open failed\n");
+    }
 
     return false;
 }

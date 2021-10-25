@@ -98,9 +98,10 @@ int imagetools_rawconvert_HBIT_to_1555(const void *pSrc, unsigned int nSrcSize,
 
     unsigned int i = 0;     
     unsigned int j = 0;
+    int k = 0;
     for (i = 0,j = 0; i < n8SrcSize && j < n16DstSize; ++i)
     {
-        for (int k = 0; k < 8 && j < n16DstSize; ++k, ++j)
+        for (k = 0; k < 8 && j < n16DstSize; ++k, ++j)
         {
             if (p8Src[i] & bitmap[k])
             {
@@ -130,9 +131,10 @@ int imagetools_rawconvert_HBIT_to_RGBA(const void *pSrc, unsigned int nSrcSize,
 
     unsigned int i = 0;     
     unsigned int j = 0;
+    int k = 0;
     for (i = 0,j = 0; i < n8SrcSize && j < n32DstSize; ++i)
     {
-        for (int k = 0; k < 8 && j < n32DstSize; ++k, ++j)
+        for (k = 0; k < 8 && j < n32DstSize; ++k, ++j)
         {
             if (p8Src[i] & bitmap[k])
             {
@@ -170,8 +172,10 @@ int imagetools_scale_rgba(const void *pSrc, unsigned int nSrcW, unsigned int nSr
 	// double fh_yu = fh - (int)fh;
  
 	unsigned int x=0,y=0;
+    unsigned int hnum = 0;
+    unsigned int wnum = 0;
  
-	for (unsigned int hnum = 0; hnum < dst_height; ++hnum) //按照从左到右，从上到下的顺序进行转换
+	for (hnum = 0; hnum < dst_height; ++hnum) //按照从左到右，从上到下的顺序进行转换
 	{
 		y = round(hnum / fh);   //计算当前临近坐标的y值
  
@@ -180,7 +184,7 @@ int imagetools_scale_rgba(const void *pSrc, unsigned int nSrcW, unsigned int nSr
             y = src_height - 1;
         }
  
-		for (unsigned int wnum = 0; wnum < dst_width; ++wnum)
+		for (wnum = 0; wnum < dst_width; ++wnum)
 		{
 			x = round(wnum / fw); //计算当前临近坐标的x值
  
@@ -342,7 +346,9 @@ static int imagetools_settwocolor_rgba (void *pPixels, unsigned int nPixelCount,
     U32_RGBA *pRGBAPixel_BackTo = (U32_RGBA *)pBackToColor;
     U32_RGBA *pRGBAPixel_FrontTo = (U32_RGBA *)pFrontToColor;
 
-    for (unsigned int i = 0; i < nPixelCount; ++i)
+    unsigned int i = 0;
+
+    for (i = 0; i < nPixelCount; ++i)
     {
         if (pRGBAPixel[i] == *pRGBAPixel_Back)
         {
@@ -428,9 +434,12 @@ static int imagetools_drawimage_1555 (void *pDstPixels, unsigned int nDstWidth, 
     U16_1555 *p16DstPixels1555 = (U16_1555 *)pDstPixels;
     U16_1555 *p16SrcPixels1555 = (U16_1555 *)pSrcPixels;
 
-    for (unsigned int ySrc = 0; ySrc < nSrcHeight; ++ySrc)
+    unsigned int xSrc = 0;
+    unsigned int ySrc = 0;
+
+    for (ySrc = 0; ySrc < nSrcHeight; ++ySrc)
     {
-        for (unsigned int xSrc = 0; xSrc < nSrcWidth; ++xSrc)
+        for (xSrc = 0; xSrc < nSrcWidth; ++xSrc)
         {
             int xDst = (int)(xSrc + nX);
             int yDst = (int)(ySrc + nY);
@@ -479,9 +488,12 @@ static int imagetools_brushrect_1555 (void *pDstPixels, unsigned int nDstWidth, 
     U16_1555 *p16DstPixels1555 = (U16_1555 *)pDstPixels;
     U16_1555 u16SrcPixel1555 = *(U16_1555 *)pSrcPixels;
 
-    for (unsigned int ySrc = 0; ySrc < nSrcHeight; ++ySrc)
+    unsigned int xSrc = 0;
+    unsigned int ySrc = 0;
+
+    for (ySrc = 0; ySrc < nSrcHeight; ++ySrc)
     {
-        for (unsigned int xSrc = 0; xSrc < nSrcWidth; ++xSrc)
+        for (xSrc = 0; xSrc < nSrcWidth; ++xSrc)
         {
             int xDst = (int)(xSrc + nX);
             int yDst = (int)(ySrc + nY);
