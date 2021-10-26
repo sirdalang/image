@@ -48,8 +48,11 @@ static int imagetools_smallendian()
     }
 }
 
+/**
+ * @param bLowAlpha: 为真，则 1555 中，0 表示透明，1 表示不透明
+ */
 static int imagetools_rawconvert_RGBA_to_1555(const void *pSrc, unsigned int nSrcSize, 
-    void *pDst, unsigned int nDstSize)
+    void *pDst, unsigned int nDstSize, int bLowAlpha)
 {
     const U32_RGBA *p32Src = (const U32_RGBA*) pSrc;
     U16_1555 *p16Dst = (U16_1555*) pDst;
@@ -57,6 +60,9 @@ static int imagetools_rawconvert_RGBA_to_1555(const void *pSrc, unsigned int nSr
     int n16DstSize = nDstSize / sizeof(U16_1555);
 
     int bSmallEndian = imagetools_smallendian();
+
+    UBYTE nTransparent = (bLowAlpha ? 0 : 1);
+    UBYTE nDisTransparent = (bLowAlpha ? 1 : 0);
 
     int i = 0;
     int j = 0;
@@ -69,7 +75,7 @@ static int imagetools_rawconvert_RGBA_to_1555(const void *pSrc, unsigned int nSr
             pC1555->red = (pCRGBA->red & 0xF8) >> 3;
             pC1555->green = (pCRGBA->green & 0xF8) >> 3;
             pC1555->blue = (pCRGBA->blue & 0xF8) >> 3;
-            pC1555->alpha = (pCRGBA->alpha > 0x80 ? 1 : 0);
+            pC1555->alpha = (pCRGBA->alpha > 0x80 ? nTransparent : nDisTransparent);
         }
         else 
         {
@@ -77,7 +83,7 @@ static int imagetools_rawconvert_RGBA_to_1555(const void *pSrc, unsigned int nSr
             pC1555->red = (pCRGBA->red & 0xF8) >> 3;
             pC1555->green = (pCRGBA->green & 0xF8) >> 3;
             pC1555->blue = (pCRGBA->blue & 0xF8) >> 3;
-            pC1555->alpha = (pCRGBA->alpha > 0x80 ? 1 : 0);
+            pC1555->alpha = (pCRGBA->alpha > 0x80 ? nTransparent : nDisTransparent);
         }
     }
 
@@ -252,7 +258,17 @@ int imagetools_rawconvert (const void *pSrc, unsigned int nSrcSize,
     {
         case IMAGE_RAW_RGBA_1555:
         {
-            ret = imagetools_rawconvert_RGBA_to_1555 (pSrc, nSrcSize, pDst, nDstSize);
+            ret = imagetools_rawconvert_RGBA_to_1555 (pSrc, nSrcSize, pDst, nDstSize, FALSE);
+            break;
+        }
+        case IMAGE_RAW_RGBA_1555_0ALPHA:
+        {
+            ret = imagetools_rawconvert_RGBA_to_1555 (pSrc, nSrcSize, pDst, nDstSize, TRUE);
+            break;
+        }
+        case IMAGE_RAW_RGBA_1555_1ALPHA:
+        {
+            ret = imagetools_rawconvert_RGBA_to_1555 (pSrc, nSrcSize, pDst, nDstSize, FALSE);
             break;
         }
         case IMAGE_RAW_HBIT_1555_1BLACK_1ALPHA:
@@ -383,17 +399,22 @@ int imagetools_settwocolor (void *pPixels, unsigned int nPixelCount,
     return ret;
 }
 
-static U16_1555 imagetools_mixto_1555(U16_1555 pixel1555_Board, U16_1555 pixel1555_Paint)
+/**
+ * @param bLowAlpha: 为真，则 0 表示透明，1 表示不透明
+ */
+static U16_1555 imagetools_mixto_1555(U16_1555 pixel1555_Board, U16_1555 pixel1555_Paint, int bLowAlpha)
 {
     int bSmallEndian = imagetools_smallendian();
     U16_1555 pixelMixed = 0;
+
+    int n1555Transparent = (bLowAlpha ? 0 : 1);
 
     int bPaintTransparent = FALSE;
 
     if (bSmallEndian)
     {
         const C_1555_SmallEndian* p1555Paint = (const C_1555_SmallEndian*)& pixel1555_Paint;
-        if (1 == p1555Paint->alpha)
+        if (n1555Transparent == p1555Paint->alpha)
         {
             bPaintTransparent = TRUE;
         }
@@ -405,7 +426,7 @@ static U16_1555 imagetools_mixto_1555(U16_1555 pixel1555_Board, U16_1555 pixel15
     else 
     {
         const C_1555_BigEndian* p1555Paint = (const C_1555_BigEndian*)& pixel1555_Paint;
-        if (1 == p1555Paint->alpha)
+        if (n1555Transparent == p1555Paint->alpha)
         {
             bPaintTransparent = TRUE;
         }
@@ -429,7 +450,7 @@ static U16_1555 imagetools_mixto_1555(U16_1555 pixel1555_Board, U16_1555 pixel15
 
 static int imagetools_drawimage_1555 (void *pDstPixels, unsigned int nDstWidth, unsigned int nDstHeight, 
     const void *pSrcPixels, unsigned int nSrcWidth, unsigned int nSrcHeight, 
-    int nX, int nY, IMAGE_DRAW_MODE eDrawMode)
+    int nX, int nY, IMAGE_DRAW_MODE eDrawMode, int bLowAlpha)
 {
     U16_1555 *p16DstPixels1555 = (U16_1555 *)pDstPixels;
     U16_1555 *p16SrcPixels1555 = (U16_1555 *)pSrcPixels;
@@ -465,7 +486,7 @@ static int imagetools_drawimage_1555 (void *pDstPixels, unsigned int nDstWidth, 
                 case IMAGE_DRAW_MIX:
                 {
                     p16DstPixels1555[nDstIndex] = imagetools_mixto_1555(p16DstPixels1555[nDstIndex],
-                                            p16SrcPixels1555[nSrcIndex]);
+                                            p16SrcPixels1555[nSrcIndex], bLowAlpha);
                     break;
                 }
                 case IMAGE_DRAW_COVER:
@@ -483,7 +504,7 @@ static int imagetools_drawimage_1555 (void *pDstPixels, unsigned int nDstWidth, 
 
 static int imagetools_brushrect_1555 (void *pDstPixels, unsigned int nDstWidth, unsigned int nDstHeight,
     const void *pSrcPixels, unsigned int nSrcWidth, unsigned int nSrcHeight, 
-    int nX, int nY, IMAGE_DRAW_MODE eDrawMode)
+    int nX, int nY, IMAGE_DRAW_MODE eDrawMode, int bLowAlpha)
 {
     U16_1555 *p16DstPixels1555 = (U16_1555 *)pDstPixels;
     U16_1555 u16SrcPixel1555 = *(U16_1555 *)pSrcPixels;
@@ -519,7 +540,7 @@ static int imagetools_brushrect_1555 (void *pDstPixels, unsigned int nDstWidth, 
                 case IMAGE_DRAW_MIX:
                 {
                     p16DstPixels1555[nDstIndex] = imagetools_mixto_1555(p16DstPixels1555[nDstIndex],
-                                            u16SrcPixel1555);
+                                            u16SrcPixel1555, bLowAlpha);
                     break;
                 }
                 case IMAGE_DRAW_COVER:
@@ -545,7 +566,19 @@ int imagetools_drawimage (void *pDstPixels, unsigned int nDstWidth, unsigned int
         case IMAGE_RAW_1555:
         {
             ret = imagetools_drawimage_1555 (pDstPixels, nDstWidth, nDstHeight, 
-                            pSrcPixels, nSrcWidth, nSrcHeight, nX, nY, eDrawMode);
+                            pSrcPixels, nSrcWidth, nSrcHeight, nX, nY, eDrawMode, FALSE);
+            break;
+        }
+        case IMAGE_RAW_1555_1ALPHA:
+        {
+            ret = imagetools_drawimage_1555 (pDstPixels, nDstWidth, nDstHeight, 
+                            pSrcPixels, nSrcWidth, nSrcHeight, nX, nY, eDrawMode, FALSE);
+            break;
+        }
+        case IMAGE_RAW_1555_0ALPHA:
+        {
+            ret = imagetools_drawimage_1555 (pDstPixels, nDstWidth, nDstHeight, 
+                            pSrcPixels, nSrcWidth, nSrcHeight, nX, nY, eDrawMode, TRUE);
             break;
         }
         default:
@@ -567,7 +600,7 @@ int imagetools_brushrect (void *pDstPixels, unsigned int nDstWidth, unsigned int
         case IMAGE_RAW_1555:
         {
             ret = imagetools_brushrect_1555 (pDstPixels, nDstWidth, nDstHeight, 
-                            pSrcPixels, nSrcWidth, nSrcHeight, nX, nY, eDrawMode);
+                            pSrcPixels, nSrcWidth, nSrcHeight, nX, nY, eDrawMode, FALSE);
             break;
         }
         default:

@@ -151,12 +151,12 @@ static void fun_with_drawC()
     C1555print (sPixel1555_Board, sizeof(sPixel1555_Board), 6);
 }
 
-int main(int argc, char *argv[])
+static void fun_with_imageA(int argc, char **argv)
 {
     if (argc != 2)
     {
         _error ("usage: %s [filename]\n", argv[0]);
-        return -1;   
+        return ;   
     }
 
     const char *szFile = argv[1];
@@ -169,7 +169,7 @@ int main(int argc, char *argv[])
     if (handle == NULL)
     {
         _error ("open failed\n");
-        return -1;
+        return ;
     }
 
     int nW = 0;
@@ -193,11 +193,32 @@ int main(int argc, char *argv[])
 
     image2rgba_close (handle);
 
-    // fun_with_drawB ();
-    fun_with_drawC ();
-
     free (pPixel);
     pPixel = NULL;
+}
+
+static void fun_with_convertA()
+{
+    Image2RGBA_Pixel arrayPixel[4] = {{0,0,0,0},{0,0,0,255},{0,0,0,0},{0,0,0,255}};
+
+    unsigned short array1555[4] = {};
+
+    imagetools_rawconvert (& arrayPixel, sizeof(arrayPixel),
+        & array1555, sizeof(array1555), IMAGE_RAW_RGBA_1555_0ALPHA);
+
+    RGBAprint ((const Image2RGBA_Pixel *)(& arrayPixel), 4, 2);
+    C1555print (& array1555, sizeof(array1555), 2);
+
+    return ;
+}
+
+int main(int argc, char *argv[])
+{
+
+
+    // fun_with_drawB ();
+    // fun_with_drawC ();
+    fun_with_convertA ();
 
     return 0;
 }

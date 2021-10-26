@@ -3,7 +3,17 @@
  * Date: 20210503
  * Description: rgba --> 1555,...
  * 
- * 说明：
+ * 注：
+ * 对于 RGBA，ALPHA 0 表示不透明，255 表示全透明
+ * 
+ * RGBA
+ * 透明 [x,x,x,255]
+ * 红色 [255,0,0,0]
+ * 绿色 [0,255,0,0]
+ * 蓝色 [0,0,255,0]
+ * 白色 [255,255,255,0]
+ * 黑色 [0,0,0,0]
+ * 
  * 1555 格式的字节排列按照书写的顺序排列，或者说是大端字节序（即地址从低到高依次是alpha,red,green,blue）。
  * 0x0000 表示黑色
  * 0x8C00 表示红色
@@ -13,8 +23,13 @@
 
 typedef enum 
 {
-    IMAGE_RAW_RGBA_1555 = 0x1,
-    IMAGE_RAW_HBIT_1555_1BLACK_1ALPHA,        // HBIT: BYTE & 0x80 表示第一个像素，1 表示 黑色，alpha 为 1
+    /* rgba --> 1555 */
+    IMAGE_RAW_RGBA_1555 = 0x1,  // 1555 中 1 表示透明
+    IMAGE_RAW_RGBA_1555_1ALPHA, // 1555 中 1 表示透明
+    IMAGE_RAW_RGBA_1555_0ALPHA, // 1555 中 0 表示透明
+
+    /* 位图 --> 1555 */
+    IMAGE_RAW_HBIT_1555_1BLACK_1ALPHA = 0x10,        // HBIT: BYTE & 0x80 表示第一个像素，1 表示 黑色，alpha 为 1
     IMAGE_RAW_HBIT_1555_1BLACK_0ALPHA,        // HBIT: BYTE & 0x80 表示第一个像素，1 表示 黑色，alpha 为 0
     IMAGE_RAW_HBIT_1555_1WHITE_1ALPHA,        // HBIT: BYTE & 0x80 表示第一个像素，1 表示 白色，alpha 为 1
     IMAGE_RAW_HBIT_1555_1WHITE_0ALPHA,        // HBIT: BYTE & 0x80 表示第一个像素，1 表示 白色，alpha 为 0
@@ -23,13 +38,15 @@ typedef enum
 typedef enum
 {
     IMAGE_RAW_RGBA = 0x1,
-    IMAGE_RAW_1555,
+    IMAGE_RAW_1555, // 1555 中 1 表示透明
+    IMAGE_RAW_1555_1ALPHA,  // 1555 中 1 表示透明
+    IMAGE_RAW_1555_0ALPHA,  // 1555 中 0 表示透明
 } IMAGE_RAW_TYPE_E;
 
 typedef enum
 {
-    IMAGE_DRAW_COVER = 0,
-    IMAGE_DRAW_MIX
+    IMAGE_DRAW_COVER = 0, // 总是覆盖掉底色
+    IMAGE_DRAW_MIX,     // 如果绘制的颜色为透明色，则不覆盖底色
 } IMAGE_DRAW_MODE;
 
 #ifdef __cplusplus
