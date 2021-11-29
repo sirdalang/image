@@ -149,6 +149,12 @@ bool ImageInterface::GuessImageType(const char *szFilename, IMAGE_FILE_TYPE_E *e
     }
     while (0);
 
+    if (fd != -1)
+    {
+        close (fd);
+        fd = -1;
+    }
+
     return bGuessOk ? true : false;
 }
 
