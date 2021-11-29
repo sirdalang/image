@@ -3,7 +3,8 @@
  * Date: 20210501
  * Description: image to rgba
  * 
- * 
+ * 注：
+ * 对于 RGBA，ALPHA 0 表示不透明，255 表示全透明
  */
 
 #pragma once
